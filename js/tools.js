@@ -7,6 +7,23 @@ function _coalesce( value1, value2 ) {
 }
 
 /*
+	Return HTML element by id.
+*/
+function _getById(id) {
+	return document.getElementById(id);
+}
+
+/*
+	Create new HTML element.
+*/
+function _create( parent, tag, content ) {
+	var el = document.createElement(tag);
+	el.innerHTML = content;	
+	parent.appendChild(el);
+	return el;
+}
+
+/*
 	Remove element from an array.
 */
 function _remove( arr, el ) {
@@ -21,6 +38,15 @@ function _append( arr1, arr2 ) {
 		arr1.push(arr2[i]);
 	} 
 }
+
+// adds an element to the array if it does not already exist using a comparer
+function _appendIfNotExist(arr1, arr2) { 
+    for ( var i = 0, max = arr2.length; i < max; i++) {
+		if (arr1.indexOf(arr2[i]) == -1) {
+			arr1.push(arr2[i]);
+		}
+	} 
+};
 
 /*
 	Returns random integer number between a and b.
@@ -54,3 +80,50 @@ function _round( num, digits ) {
 	var x = Math.pow(10, _coalesce(digits, 2));
 	return Math.round(num * x) / x;
 }
+
+function _isObject( o ) {
+	return ((o !== null) && (typeof o === 'object'));
+}
+
+function _getJSON( url, onsuccess, onerror ) {
+	var xmlhttp = new XMLHttpRequest();
+
+	xmlhttp.onreadystatechange = function() {
+		if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+			var result;
+			try {
+				result = JSON.parse(xmlhttp.responseText);				
+			} catch(e) {
+				console.log("JSON parse error.");
+				console.log(xmlhttp.responseText);
+				if (onerror) {
+					onerror();
+				}
+			}
+			if (_isObject(result)) {
+				onsuccess(result);
+			}
+		} else {			
+			//console.log("JSON GET result: " + xmlhttp.status);			
+		}
+	}
+
+	xmlhttp.open("GET", url, true);
+	xmlhttp.send();
+}
+
+function _bind( scope, fn ) {
+	return function () {
+		fn.apply( scope, arguments );
+	};
+};
+
+function _getTypeName (obj) { 
+	if (_isObject(obj)) {
+	   var funcNameRegex = /function (.{1,})\(/;
+	   var results = (funcNameRegex).exec((obj).constructor.toString());
+	   return (results && results.length > 1) ? results[1] : "";
+	} else {
+		return obj;
+	}
+};

@@ -4,22 +4,18 @@
 	
 	global $db;
 	
-	$sceneID = _get('scene_id');
+	$ids = _get('ids');
 	
-	if ($sceneID > 0) {
-		$query = $query = "SELECT * FROM resources WHERE resource_id IN (
-				SELECT DISTINCT sr.resource_id 
-				FROM scene_resources sr
-				WHERE sr.scene_id = $sceneID
-			)";
+	if (strlen($ids) > 0) {
+		$query = "SELECT * FROM resources WHERE resource_id IN ( $ids )";
 	} else {
 		$query = "SELECT * FROM resources";
 	}
-	$result = mysql_query($query,$db) or die('Debile query:  '.$query);
+	$result = $db->query($query) or die('SQL Error - '.$query);
 		
 	$resources = array();
-	if(mysql_num_rows($result)) {
-		while($resource = mysql_fetch_assoc($result)) {
+	if(mysqli_num_rows($result)) {
+		while($resource = mysqli_fetch_assoc($result)) {
 			$resources[] = $resource;
 		}
 	}

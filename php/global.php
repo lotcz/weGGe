@@ -1,7 +1,6 @@
 <?php
 
-	$db = mysql_connect('localhost','root','') or die('Cannot connect to DB');
-	mysql_select_db('wegge',$db) or die('Cannot select DB');
+	$db = mysqli_connect("p:localhost","root","","wegge") or die("Error " . mysqli_error($link)); 
 
 	function _redirect($page) {
 		$host  = $_SERVER['HTTP_HOST'];

@@ -117,8 +117,6 @@ function weggeControls( params ) {
 				this.camera.position.y = this.limitMovementMinY;
 			}
 		}
-			
-		if (this.driveBuggy && this.buggy) this.controlBuggy( delta );
 	
 	}
 		
@@ -150,14 +148,11 @@ function weggeControls( params ) {
 		this.moveDown = false;
 	}
 	
-	this.element.addEventListener( 'keydown', bind( this, this.onKeyDown) , false );	
-	this.element.addEventListener( 'keyup', bind( this, this.onKeyUp ), false );
-	this.element.addEventListener( 'mousemove', bind( this, this.onMouseMove ), false );
+	window.addEventListener( 'resize', _bind( this, this.onWindowResize) , false );	
+	this.element.addEventListener( 'keydown', _bind( this, this.onKeyDown) , false );	
+	this.element.addEventListener( 'keyup', _bind( this, this.onKeyUp ), false );
+	this.element.addEventListener( 'mousemove', _bind( this, this.onMouseMove ), false );
 	
-	function bind( scope, fn ) {
-		return function () {
-			fn.apply( scope, arguments );
-		};
-	};
-	
+	this.onWindowResize();
+		
 }
