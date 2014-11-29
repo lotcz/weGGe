@@ -8,6 +8,7 @@ function weggeResources() {
 }
 
 weggeResources.prototype.loadFromJSON = function ( json ) {	
+	this.initialized = false;
 	var resource, resource_id, resource_json;	
 	for (var i = 0, max = json.length; i < max; i++ ){
 		resource_id = json[i].resource_id;
@@ -20,8 +21,7 @@ weggeResources.prototype.loadFromJSON = function ( json ) {
 		resource = new window["wegge" + resource_json.type]();
 		resource.loadFromJSON( parseInt(resource_id), resource_json);
 		this.resources.push( resource );		
-	}
-	this.missing = json.length;
+	}	
 }
 
 weggeResources.prototype.getById = function ( id ) {
@@ -32,19 +32,18 @@ weggeResources.prototype.getById = function ( id ) {
 	}
 }
 
-weggeResources.prototype.initialize = function ( onInitialized ) {
+weggeResources.prototype.resourceInitialized = function() {
+	this.missing -= 1;
+	if (this.missing == 0) {
+		this.initialized = true;
+		this.onInitialized();
+	}
+}
+
+weggeResources.prototype.initialize = function () {
+	this.missing = this.resources.length;
 	for ( var i = 0, max = this.resources.length; i < max; i++) {
-		(function(_this) {
-			_this.resources[i].initialize(
-				function() {
-					_this.missing -= 1;
-					if (_this.missing == 0) {
-						_this.initialized = true;
-						onInitialized();
-					}
-				}
-			);		
-		})(this);
+		this.resources[i].initialize( _bind(this, this.resourceInitialized) );		
 	}
 }
 	

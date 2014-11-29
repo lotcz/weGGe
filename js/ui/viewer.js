@@ -12,12 +12,12 @@ function weggeViewer() {
 		
 		this.host3D.onAnimationFrame = _bind(this, this.animationFrame);
 		
-		if (this.level) {
-			this.host3D.scene.add(this.level.initialize(this.resources));
+		if (this.level) {			
 			this.host3D.renderer.setClearColor( _coalesce(this.level.json.clearColor, 0x101010) );
 			if (this.level.json.ambientLight) {				
 				this.host3D.scene.add(new THREE.AmbientLight(this.level.json.ambientLight));
 			}
+			this.host3D.scene.add(this.level.initialize(this.resources));
 		}
 		
 		if (!this.controls) {
@@ -40,8 +40,8 @@ function weggeViewer() {
 	}
 	
 	this.levelLoaded = function( data ) { 
-		console.log("level loaded:");
-		console.log(data);
+		//console.log("level loaded:");
+		//console.log(data);
 		this.level = new weggeLevel();
 		this.level.loadFromJSON(data.level_id, data.level_json);
 		var res = this.level.getRequiredResources();
@@ -55,8 +55,8 @@ function weggeViewer() {
 	this.startLoadingLevel = function( level_id ) {
 		this.resetHost3D();
 		this.resources = false;
-		_getJSON(
-			'php/loadLevel.php?level_id=' + level_id,
+		$.get("php/loadLevel.php",
+			{level_id: level_id},
 			_bind(this, this.levelLoaded)
 		);		
 	}
@@ -85,12 +85,13 @@ function weggeViewer() {
 	this.resourcesLoaded = function( resources_json ) { 
 		this.resources = new weggeResources();
 		this.resources.loadFromJSON( resources_json );
-		this.resources.initialize( _bind(this, this.start) );
+		this.resources.onInitialized = _bind(this, this.start);
+		this.resources.initialize();
 	}		
 	
 	this.loadResources = function(ids) {
-		_getJSON( 
-			'php/loadResources.php?ids='+_coalesce(ids,''),
+		$.get("php/loadResources.php", 
+			{ids:_coalesce(ids,'')},
 			_bind(this, this.resourcesLoaded)
 		);
 	}

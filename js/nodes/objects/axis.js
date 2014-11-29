@@ -1,7 +1,12 @@
-weggeAxis.prototype = new weggeObject();
-weggeAxis.prototype.constructor = weggeObject; 
+weggeAxis.prototype = new weggeNode();
+weggeAxis.prototype.constructor = weggeAxis; 
 
 function weggeAxis() {
+	this.base = weggeNode;
+	this.base();
+	
+	this.json.type = "Axis";
+	this.json.name = "";
 }
 
 weggeAxis.prototype.initialize = function ( resources ) {
@@ -52,3 +57,5 @@ weggeAxis.prototype.initialize = function ( resources ) {
 	}	
 	return this.wrapper;
 }
+
+weggeNode.prototype.availableTypes.push("Axis");

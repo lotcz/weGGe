@@ -5,11 +5,10 @@ body, div {
 }
 
 body {
-	font-family: Cambria, sans-serif;
-	font-size: 120%;
-	font-size:120%;
+	font-family: Cambria, sans-serif;	
 	overflow: hidden;
 	background-color: Black;
+	font-size:4mm;
 }
 
 #ui {
@@ -27,30 +26,55 @@ body {
 	opacity:0.8;
 }
 
-#ui ul.menu {
-	list-style-image:none;
+#ui ul {
 	padding:0;
 	margin:0;
+}
+
+#ui ul li {
+	padding:1px 15px;
+}
+
+#ui ul.menu {
+	list-style-type:none;
+	text-align:center;
+	margin-top:10px;
 }
 
 #ui ul.menu li {
 	display:inline-block;
+	border:solid 1px #E0E0E0;		
+	cursor:pointer;
+	padding:2px;
+	margin-right:10px;
+	border-radius:5px;
+}
+
+#ui ul.menu li:hover {
+	background-color:#909090;
+}
+
+#ui .main-menu {
+	font-size:5mm;
+}
+
+#ui .main-menu ul.menu {
+	text-align:left;
+	margin-top:0;
+}
+
+#ui .main-menu ul.menu li {
 	padding:5px 15px;
 	margin-right:20px;
-	border:solid 1px White;
 	border-radius:10px;
-	cursor:pointer;
 }
 
 #ui ul.node-tree {
-	padding:0;
-	margin:0;
-	font-size:4mm;
 	list-style-position: inside;
 }
 
 #ui ul.node-tree li {	
-	padding:0px 15px;	
+		
 }
 
 #ui ul.node-tree a:hover {	
@@ -63,16 +87,44 @@ body {
 	cursor:default;
 }
 
-.form-item, .form-item input {
+#ui ul.form {
+	list-style-type:none;
+}
+
+#ui ul.form li {
+	/*padding:5px 15px;*/
+}
+
+#ui .form-item input {
+	width:100px;
 	font-family:monospace;
-}
-
- .form-item input {
-	width:400px;
 	display:inline-block;
 }
 
-.form-item label {
-	width:150px;
+#ui .form-item label {
+	width:100px;
 	display:inline-block;
+}
+
+#ui .overlay {
+	display:block;
+	position:fixed;
+	top:0;
+	left:0;
+	right:0;
+	bottom:0;
+	background-color:Black;
+	opacity:0.5;
+}
+
+#ui .list {
+
+}
+
+#ui .list td{
+	cursor:pointer;
+}
+
+#ui .list tr:hover, #ui .list td:hover {
+	text-decoration:underline;
 }

@@ -1,65 +1,21 @@
 weggeObject.prototype = new weggeNode();
-weggeObject.prototype.constructor = weggeNode; 
+weggeObject.prototype.constructor = weggeObject; 
 
 function weggeObject() {
-
-}
-
-/* call this.initializeChildren(resources) to initialize all children from resources */
-weggeObject.prototype.initializeChildren = function ( resources ) {
-	var child_wrapper;
-	for ( var i = 0, max = this.children.length; i < max; i++) {
-		child_wrapper = this.children[i].initialize(resources);
-		if (child_wrapper) {
-			if (!this.wrapper) {
-				this.wrapper = new THREE.Object3D();
-			}
-			this.wrapper.add(child_wrapper);
-		}
-	}
-}
-
-weggeObject.prototype.getChildrenRequiredResources = function() {
-	var required = [];
-	for ( var i = 0, max = this.children.length; i < max; i++) {
-		_appendIfNotExist(required, this.children[i].getRequiredResources());
-	}
-	return required;
-}
-
-/* animates all children */
-weggeObject.prototype.childrenAnimationFrame = function(delta) {
-	for ( var i = 0, max = this.children.length; i < max; i++) {
-		this.children[i].animationFrame(delta);
-	}
-}
-
-/* CAN OVERRIDE */
-
-weggeObject.prototype.initialize = function ( resources ) {
-	/* add node's type initialization */
-		//this.wrapper = new THREE.Object3D();
-	/**/
+	this.base = weggeNode;
+	this.base();
 	
-	this.initializeChildren(resources);
-	return this.wrapper;
+	this.json.type = "Object";
+	this.json.position = {x:0,y:0,z:0};
+	this.json.rotation = {x:0,y:0,z:0};
+	this.json.scale = {x:1,y:1,z:1};
 }
 
-weggeObject.prototype.animationFrame = function(delta) {
-	/* perform animation */
-
-	/**/
-	
-	this.childrenAnimationFrame(delta);
+weggeObject.prototype.applyBasic = function() {
+	this.wrapper.position.set(this.json.position.x, this.json.position.y, this.json.position.z);
+	this.wrapper.rotation.set(this.json.rotation.x, this.json.rotation.y, this.json.rotation.z);
+	this.wrapper.scale.set(this.json.scale.x, this.json.scale.y, this.json.scale.z);
 }
 
-weggeObject.prototype.getRequiredResources = function() {
-	var required = [];
-	/* add node's specific resources here */ 
-	
-	/**/
-	_appendIfNotExist(required, this.getChildrenRequiredResources());
-	return required;
-}
 
 weggeNode.prototype.availableTypes.push("Object");

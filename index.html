@@ -21,14 +21,19 @@
 	<script src="js/textSprites.js" language="javascript"></script>
 	
 	<script src="js/nodes/node.js" language="javascript"></script>
-	<script src="js/nodes/objects/object.js" language="javascript"></script>
-	<script src="js/nodes/objects/level.js" language="javascript"></script>
+	<script src="js/nodes/level.js" language="javascript"></script>
+	<script src="js/nodes/objects/object.js" language="javascript"></script>	
 	<script src="js/nodes/objects/axis.js" language="javascript"></script>	
 	<script src="js/nodes/objects/plane.js" language="javascript"></script>
+	<script src="js/nodes/objects/sphere.js" language="javascript"></script>
+	
 	<script src="js/nodes/resources/resources.js" language="javascript"></script>
 	<script src="js/nodes/resources/resource.js" language="javascript"></script>
 	<script src="js/nodes/resources/texture.js" language="javascript"></script>
 
+	<script src="js/nodes/helpers/axisHelper.js" language="javascript"></script>
+	<script src="lib/transformControls.js" language="javascript"></script>
+	
 	<script src="js/ui/ui.js" language="javascript"></script>
 	<script src="js/ui/viewer.js" language="javascript"></script>
 	<script src="js/ui/creator.js" language="javascript"></script>
@@ -37,7 +42,7 @@
 	
 		$(function () {
 			var creator = new weggeCreator();
-			creator.startLoadingLevel(1);
+			//creator.startLoadingLevel(1);
 		});
 		
 	</script>
