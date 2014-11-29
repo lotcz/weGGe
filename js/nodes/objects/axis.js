@@ -5,6 +5,7 @@ function weggeAxis() {
 	this.base = weggeNode;
 	this.base();
 	
+	this.json.name = "--axis--";
 	this.json.type = "Axis";
 	this.json.name = "";
 }

@@ -6,16 +6,29 @@ function weggeObject() {
 	this.base();
 	
 	this.json.type = "Object";
-	this.json.position = {x:0,y:0,z:0};
-	this.json.rotation = {x:0,y:0,z:0};
-	this.json.scale = {x:1,y:1,z:1};
+	this.json.position = [0,0,0];
+	this.json.rotation = [0,0,0];
+	this.json.scale = [1,1,1];
+}
+
+weggeObject.prototype.basicPropsEdited = function() {
+	this.json.position = _getArr(this.wrapper.position);
+	this.json.rotation = _getArr(this.wrapper.rotation);
+	this.json.scale = _getArr(this.wrapper.scale);
 }
 
 weggeObject.prototype.applyBasic = function() {
-	this.wrapper.position.set(this.json.position.x, this.json.position.y, this.json.position.z);
-	this.wrapper.rotation.set(this.json.rotation.x, this.json.rotation.y, this.json.rotation.z);
-	this.wrapper.scale.set(this.json.scale.x, this.json.scale.y, this.json.scale.z);
+	_applyArr(this.wrapper.position, this.json.position);
+	_applyArr(this.wrapper.rotation, this.json.rotation);
+	_applyArr(this.wrapper.scale, this.json.scale);	
 }
 
+function _applyArr( v, arr ) {
+	v.set( arr[0], arr[1], arr[2] );
+}
+
+function _getArr( v ) {
+	return [v.x,v.y,v.z];
+}
 
 weggeNode.prototype.availableTypes.push("Object");

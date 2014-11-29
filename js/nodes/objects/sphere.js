@@ -5,6 +5,7 @@ function weggeSphere() {
 	this.base = weggeObject;
 	this.base();
 	
+	this.json.name = "--sphere--";
 	this.json.type = "Sphere";
 	this.json.radius = 100;
 	this.json.widthSegments = 10;
@@ -17,8 +18,7 @@ weggeSphere.prototype.initialize = function() {
 	var color = new THREE.Color();
 	color.setStyle(this.json.color);
 	this.wrapper = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial({color:color}) );
-	this.wrapper.position.set(this.json.position.x, this.json.position.y, this.json.position.z);
-	this.wrapper.rotation.set(this.json.rotation.x, this.json.rotation.y, this.json.rotation.z);
+	this.applyBasic();
 	return this.wrapper;
 }
 

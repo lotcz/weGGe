@@ -1,5 +1,6 @@
 function weggeNode() {
 	this.json = {};
+	this.json.name = "--node--";
 	this.json.type = "Node";
 	this.children = [];	
 }
@@ -77,12 +78,16 @@ weggeNode.prototype.initializeChildren = function ( resources ) {
 	for ( var i = 0, max = this.children.length; i < max; i++) {
 		child_wrapper = this.children[i].initialize(resources);
 		if (child_wrapper) {
-			if (!this.wrapper) {
-				this.wrapper = new THREE.Object3D();
-			}
-			this.wrapper.add(child_wrapper);
+			this.addChildWrapper(child_wrapper);
 		}
 	}
+}
+
+weggeNode.prototype.addChildWrapper = function ( wrapper ) {
+	if (!this.wrapper) {
+		this.wrapper = new THREE.Object3D();
+	}
+	this.wrapper.add(wrapper);
 }
 
 weggeNode.prototype.getChildrenRequiredResources = function() {

@@ -24,6 +24,22 @@ function weggeControls( params ) {
 	this.phi = 0;
 	this.theta = 0;
 	
+	this.initialize = function(camera, lat, lon) {
+		this.camera = camera;
+		if (this.camera) {
+			this.lat = _coalesce(lat, 0);
+			this.lon = _coalesce(lon, 0);
+			this.phi = THREE.Math.degToRad( 90 - this.lat );
+			this.theta = THREE.Math.degToRad( this.lon );
+			this.target.x = this.camera.position.x + 100 * Math.sin( this.phi ) * Math.cos( this.theta );
+			this.target.y = this.camera.position.y + 100 * Math.cos( this.phi );
+			this.target.z = this.camera.position.z + 100 * Math.sin( this.phi ) * Math.sin( this.theta );
+			this.camera.lookAt( this.target );	
+		}
+	}
+	
+	this.reset = this.initialize;
+	
 	this.onWindowResize = function () {
 		if ( this.element === document ) {
 			this.viewHalfX = window.innerWidth / 2;
@@ -83,6 +99,7 @@ function weggeControls( params ) {
 		}
 		
 		switch( key ) {
+			case 32: /* space */
 			case 80: /*P*/ this.lookEnabled=!this.lookEnabled;break;
 		}
 	};
@@ -120,12 +137,6 @@ function weggeControls( params ) {
 	
 	}
 		
-	this.reset = function( lat, lon ) {	
-		this.lat = _coalesce(lat, 0);
-		this.lon = _coalesce(lon, 0);
-		this.animationFrame( 0 );		
-	}
-	
 	this.resetToDefault = function() {		
 		this.lookEnabled = true;
 		this.movementEnabled = true;

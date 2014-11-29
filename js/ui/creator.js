@@ -81,8 +81,8 @@ function weggeCreator() {
 	}
 	
 	this.selectLevel = function( level ) {
-		this.startLoadingLevel(level.level_id);
-		this.levelLoadCancel();
+		this.resetUI();
+		this.startLoadingLevel(level.level_id);		
 	}
 	
 	this.levelLoadCancel = function() {
@@ -116,6 +116,15 @@ function weggeCreator() {
 		);
 	}
 	
+	this.reloadLevel = function() {		
+		this.resetUI();
+		if (this.level && this.level.id) {
+			this.startLoadingLevel(this.level.id);
+		} else {
+			console.log("No level loaded. Nothing  to reload.");
+		}
+	}
+	
 	this.loadLevelList = function() {
 		$.get("php/loadLevels.php",			
 			_bind(this, this.showLevelList)
@@ -133,7 +142,15 @@ function weggeCreator() {
 	
 	this.saveLevel = function() {
 		if (this.level) {
-			var jsonString = JSON.stringify(this.level.getJSON());
+			var json = this.level.getJSON();
+			if (this.controls) {
+				json.cameraLatitude = this.controls.lat;
+				json.cameraLongitude = this.controls.lon;
+			}
+			if (this.host3D && this.host3D.camera) {
+				json.cameraPosition = [this.host3D.camera.position.x,this.host3D.camera.position.y,this.host3D.camera.position.z];
+			}
+			var jsonString = JSON.stringify(json);
 			$.post("php/saveLevel.php", { "level_id":this.level.id,"level_json":jsonString }, 
 				_bind(this, this.levelSaved)
 			);
@@ -163,7 +180,10 @@ function weggeCreator() {
 		if (this.nodeForm) {
 			this.nodeForm.remove();
 		}
+		this.nodeTypeCancel();
+		this.levelLoadCancel();
 		this.levelNodeTree.empty();
+		this.hideTransformControls();
 		this.ui.removeOverlay();
 	}
 	
@@ -191,8 +211,9 @@ function weggeCreator() {
 		var node = new window["wegge" + ntype]();
 		this.nodeBeingEdited.children.push( node );
 		$("ul:first", this.nodeBeingEdited.treeContainer).append(this.addTreeNode(node));
-		this.editNode(node);
+		this.nodeBeingEdited.addChildWrapper(node.initialize(this.resources));
 		this.nodeTypeCancel();
+		this.editNode(node);		
 	}
 	
 	this.nodeTypeCancel = function() {
@@ -254,8 +275,8 @@ function weggeCreator() {
 				element:this.nodeForm
 			}
 		);
-		if (this.nodeBeingEdited.wrapper) {
-			//this.showTransformControls(this.nodeBeingEdited);
+		if (this.nodeBeingEdited.wrapper && this.host3D && this.host3D.initialized) {
+			this.showTransformControls(this.nodeBeingEdited);
 		}		
 	}
 	
@@ -268,10 +289,14 @@ function weggeCreator() {
 			this.editNode(node);
 		}
 		var link = $("<a></a>").appendTo(el).click( _bind(this,fnc) );
-		if (node.json && node.json.type) {
-			link.append( node.json.type );
+
+		if (node.json.name) {
+			link.append( node.json.name + "&nbsp;" );
 		}
-		//link.append( $(" <i>(" + _getTypeName(node) + ")</i>") );
+		if (node.json.type) {
+			link.append( $("<i> (" + node.json.type + ")</i>") );
+		}
+
 		node.treeContainer = el;
 		var sub = $("<ul class=\"node-tree\"></ul>").appendTo(el);
 		if (node.children && node.children.length > 0) {			
@@ -302,28 +327,32 @@ function weggeCreator() {
 
 	/* TRANSFORM CONTROLS */
 	
-	this.onTransformControlsChange = function () {
-	
+	this.onTransformControlsChange = function ( event ) {
+		if (event && event.target && event.target.object && this.nodeBeingEdited && this.nodeBeingEdited.basicPropsEdited) {
+			this.nodeBeingEdited.basicPropsEdited();
+		}
 	}
+	
+	this.onTransformControlsChangeCallback = _bind(this, this.onTransformControlsChange);
 	
 	this.hideTransformControls = function () {
 		if (this.transformControls) {
 			this.host3D.scene.remove(this.transformControls);
+			this.transformControls.removeEventListener( 'change', this.onTransformControlsChangeCallback );
+			this.transformControls.destroy();			
 			this.transformControls = false;
 		}		
 	}
 	
 	this.showTransformControls = function( node ) {
 		this.hideTransformControls();
-		this.transformControls = new THREE.TransformControls( this.host3D.camera, this.ui.element.get(0) /*this.host3D.renderer.domElement*/ );
-		this.transformControls.addEventListener( 'change', _bind(this, this.onTransformControlsChange));
+		this.transformControls = new THREE.TransformControls( this.host3D.camera, this.ui.element[0] /*this.host3D.renderer.domElement*/ );
+		this.transformControls.addEventListener( 'change', this.onTransformControlsChangeCallback);
 		this.transformControls.attach( node.wrapper );
 		this.host3D.scene.add( this.transformControls );		
-		this.showInfo("\"W\" translate | \"E\" rotate | \"R\" scale | \"+\" increase size | \"-\" decrease size, Press \"Q\" twice to toggle world/local space");
+		this.showInfo("\"T\" translate | \"Y\",\"Z\" rotate | \"U\" scale | \"+\" increase size | \"-\" decrease size, \"I\" world/local space");
 	}
-	
-	
-	
+		
 	/* INIT */
 	this.loadResources();
 }

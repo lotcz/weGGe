@@ -17,18 +17,21 @@ function weggeViewer() {
 			if (this.level.json.ambientLight) {				
 				this.host3D.scene.add(new THREE.AmbientLight(this.level.json.ambientLight));
 			}
-			this.host3D.scene.add(this.level.initialize(this.resources));
-		}
-		
-		if (!this.controls) {
-			this.controls = new weggeControls({ "camera":this.host3D.camera, element: document });
-			this.controls.resetToDefault();
-			this.controls.movementSpeed = 500;
-			this.controls.lookEnabled = false;
-			this.controls.movementEnabled = true;				
-		}
-		this.controls.camera = this.host3D.camera;
-	
+			var level_object = this.level.initialize(this.resources);
+			if (level_object) {
+				this.host3D.scene.add(level_object);
+			}
+			
+			if (!this.controls) {
+				this.controls = new weggeControls({ element: document });
+				this.controls.resetToDefault();
+				this.controls.movementSpeed = 500;
+				this.controls.lookEnabled = false;
+				this.controls.movementEnabled = true;				
+			}
+			this.controls.initialize( this.host3D.camera, this.level.json.cameraLatitude, this.level.json.cameraLongitude );
+			this.host3D.camera.position.set(this.level.json.cameraPosition[0],this.level.json.cameraPosition[1],this.level.json.cameraPosition[2]);
+		}	
 	}	
 	
 	this.resetHost3D = function () {

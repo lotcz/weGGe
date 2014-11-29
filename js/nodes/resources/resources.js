@@ -42,8 +42,12 @@ weggeResources.prototype.resourceInitialized = function() {
 
 weggeResources.prototype.initialize = function () {
 	this.missing = this.resources.length;
-	for ( var i = 0, max = this.resources.length; i < max; i++) {
-		this.resources[i].initialize( _bind(this, this.resourceInitialized) );		
+	if (this.missing == 0) {
+		this.initialized = true;
+	} else {
+		for ( var i = 0, max = this.resources.length; i < max; i++) {
+			this.resources[i].initialize( _bind(this, this.resourceInitialized) );		
+		}
 	}
 }
 	

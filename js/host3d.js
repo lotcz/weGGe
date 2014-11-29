@@ -8,12 +8,10 @@ function weggeHost3D() {
 	this.scene = new THREE.Scene();
 	this.animated = [];
 	this.camera = new THREE.PerspectiveCamera( 45, 1, 1, 10000 );
-	this.camera.position.set( 0, 0, 0 );
-	this.camera.lookAt( new THREE.Vector3(10, 10, 10) );
 	this.scene.add(this.camera);
 	this.delta = 0;
 	this.width = 320;
-	this.height = 200;
+	this.height = 200;	
 	
 	this.stats = new Stats();
 	this.stats.setMode(0); // 0: fps, 1: ms
@@ -25,6 +23,7 @@ function weggeHost3D() {
 	
 	this.destroy = function () {
 		this.stopAnimation();
+		this.initialized = false;
 		window.removeEventListener( 'resize',this.resizeClosure , false );
 		this.container.remove();
 		$(this.stats.domElement).remove();
@@ -66,4 +65,5 @@ function weggeHost3D() {
 	
 	window.addEventListener( 'resize',this.resizeClosure, false );
 	this.onWindowResize();
+	this.initialized = true;
 }				
