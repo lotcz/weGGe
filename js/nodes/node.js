@@ -5,6 +5,11 @@ function weggeNode() {
 	this.children = [];	
 }
 
+/* inherit and update scene from here */
+weggeNode.prototype.applyJSON = function( also_children ) {
+	
+}
+
 weggeNode.prototype.removeNode = function( node ) {
 	for ( var i = this.children.length-1; i >= 0; i--) {
 		if (this.children[i] === node) {
@@ -72,24 +77,6 @@ weggeNode.prototype.getJSON = function() {
 	return this.json;
 }
 
-/* call this.initializeChildren(resources) to initialize all children from resources */
-weggeNode.prototype.initializeChildren = function ( resources ) {
-	var child_wrapper;	
-	for ( var i = 0, max = this.children.length; i < max; i++) {
-		child_wrapper = this.children[i].initialize(resources);
-		if (child_wrapper) {
-			this.addChildWrapper(child_wrapper);
-		}
-	}
-}
-
-weggeNode.prototype.addChildWrapper = function ( wrapper ) {
-	if (!this.wrapper) {
-		this.wrapper = new THREE.Object3D();
-	}
-	this.wrapper.add(wrapper);
-}
-
 weggeNode.prototype.getChildrenRequiredResources = function() {
 	var required = [];
 	for ( var i = 0, max = this.children.length; i < max; i++) {
@@ -107,15 +94,16 @@ weggeNode.prototype.getRequiredResources = function() {
 	return required;
 }
 
-/* CAN OVERRIDE */
+weggeNode.prototype.initializeChildren = function ( resources ) {
+	for ( var i = 0, max = this.children.length; i < max; i++) {
+		this.children[i].initialize(resources);		
+	}
+}
 
 weggeNode.prototype.initialize = function ( resources ) {
-	/* add node's type initialization */
-		//this.wrapper = new THREE.Object3D();
-	/**/
-	
 	this.initializeChildren(resources);
-	return this.wrapper;
+	this.applyJSON();
+	this.initialized = true;
 }
 
 weggeNode.prototype.availableTypes = ["Node"];

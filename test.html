@@ -11,8 +11,9 @@
 
 	<script src="lib/three.min.js" language="javascript"></script>	
 	<script src="lib/stats.min.js" language="javascript"></script>
-	<script src="/ghobok/lib/jquery.min.js" language="javascript"></script>
-	<script src="/ghobok/lib/three.js" language="javascript"></script>	
+	<script src="lib/jquery.min.js" language="javascript"></script>
+	<script src="lib/three.min.js" language="javascript"></script>	
+	<script src="lib/helvetiker_regular.typeface.js" language="javascript"></script>
 	
 	<script src="js/tools.js" language="javascript"></script>
 	<script src="js/host3d.js" language="javascript"></script>
@@ -21,9 +22,10 @@
 	
 	<script src="js/nodes/node.js" language="javascript"></script>
 	<script src="js/nodes/objects/object.js" language="javascript"></script>
-	<script src="js/nodes/objects/level.js" language="javascript"></script>
+	<script src="js/nodes/level.js" language="javascript"></script>
 	<script src="js/nodes/objects/axis.js" language="javascript"></script>	
-	<script src="js/nodes/objects/plane.js" language="javascript"></script>
+	<script src="js/nodes/objects/basic.js" language="javascript"></script>
+	<script src="js/nodes/objects/lights.js" language="javascript"></script>
 	<script src="js/nodes/resources/resources.js" language="javascript"></script>
 	<script src="js/nodes/resources/resource.js" language="javascript"></script>
 	<script src="js/nodes/resources/texture.js" language="javascript"></script>
@@ -35,7 +37,7 @@
 	
 		$(function () {
 			var viewer = new weggeViewer();
-			viewer.startLoadingLevel(1);
+			viewer.startLoadingLevel(8);
 		});
 		
 	</script>

@@ -1,13 +1,12 @@
-weggeAxis.prototype = new weggeNode();
+weggeAxis.prototype = new weggeObject();
 weggeAxis.prototype.constructor = weggeAxis; 
 
 function weggeAxis() {
-	this.base = weggeNode;
+	this.base = weggeObject;
 	this.base();
 	
 	this.json.name = "--axis--";
-	this.json.type = "Axis";
-	this.json.name = "";
+	this.json.type = "Axis";	
 }
 
 weggeAxis.prototype.initialize = function ( resources ) {
@@ -18,7 +17,6 @@ weggeAxis.prototype.initialize = function ( resources ) {
 	this.minZ = -100;
 	this.maxZ = 100;
 	this.scale = 500;
-	this.wrapper = new THREE.Object3D();
 	var geometry = new THREE.SphereGeometry();
 	var material = new THREE.MeshBasicMaterial({color:0xffffff});
 	var x, ball, text;
@@ -56,6 +54,7 @@ weggeAxis.prototype.initialize = function ( resources ) {
 			this.wrapper.add( text );
 		}
 	}	
+	this.applyJSON();
 	return this.wrapper;
 }
 

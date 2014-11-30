@@ -1,20 +1,8 @@
-weggeCreator.prototype = new weggeViewer();
+//weggeCreator.prototype = new weggeViewer();
 
 function weggeCreator() {
 	this.base = weggeViewer;
 	this.base();
-	
-	this.ui = new weggeUI();
-	
-	this.info = this.ui.addContainer().css({position:"absolute",bottom:"0px",right:"0px"}).hide();
-	
-	this.showInfo = function( text ) {
-		this.info.html( text ).show();
-	}
-	
-	this.hideInfo = function () {
-		this.info.hide();
-	}
 	
 	this.pause = function() {
 		if (this.host3D) {
@@ -31,8 +19,23 @@ function weggeCreator() {
 			this.resetUI();
 			this.fillLevelTree();
 			this.nodeBeingEdited = this.level;
-			this.initHost3D();
+					
+			this.resetHost3D();
+			this.host3D = new weggeHost3D();
+			this.level.initialize(this.host3D, this.resources);
+			this.host3D.onAnimationFrame = _bind(this, this.animationFrame);
+		
+			if (!this.controls) {
+				this.controls = new weggeControls({ "camera":this.host3D.camera, element: document });
+				this.controls.resetToDefault();
+				this.controls.movementSpeed = 500;
+				this.controls.lookEnabled = false;
+				this.controls.movementEnabled = true;
+			}
+			
+			this.controls.initialize( this.host3D.camera, this.level.json.cameraLatitude, this.level.json.cameraLongitude );			
 			this.host3D.startAnimation();
+		
 		}
 	}
 	
@@ -47,16 +50,14 @@ function weggeCreator() {
 	}
 	
 	this.newLevelSaved = function () {
-		this.level = this.nodeBeingEdited;
 		this.start();
 	}
 	
 	this.newLevel = function() {
-		if (this.host3D) {
-			this.host3D.stopAnimation();
-		}
-		var level = new weggeLevel();
-		this.editNode( level, _bind(this, this.newLevelSaved) );
+		this.resetUI();
+		this.resetHost3D();		
+		this.level = new weggeLevel();
+		this.editNode( this.level, _bind(this, this.newLevelSaved) );
 	}
 	
 	this.levelDeleted = function() {
@@ -83,14 +84,6 @@ function weggeCreator() {
 	this.selectLevel = function( level ) {
 		this.resetUI();
 		this.startLoadingLevel(level.level_id);		
-	}
-	
-	this.levelLoadCancel = function() {
-		if (this.levelList) {
-			this.levelList.remove();
-			this.levelList = false;
-			this.ui.removeOverlay();
-		}
 	}
 	
 	this.showLevelList = function( levels_json ) {
@@ -174,12 +167,11 @@ function weggeCreator() {
 			_bind(this, this.resourceSaved)
 		);
 	}
-	
-	
+		
 	this.resetUI = function() {
 		if (this.nodeForm) {
 			this.nodeForm.remove();
-		}
+		}		
 		this.nodeTypeCancel();
 		this.levelLoadCancel();
 		this.levelNodeTree.empty();
@@ -211,7 +203,9 @@ function weggeCreator() {
 		var node = new window["wegge" + ntype]();
 		this.nodeBeingEdited.children.push( node );
 		$("ul:first", this.nodeBeingEdited.treeContainer).append(this.addTreeNode(node));
-		this.nodeBeingEdited.addChildWrapper(node.initialize(this.resources));
+		if (this.nodeBeingEdited.addChildWrapper) {
+			this.nodeBeingEdited.addChildWrapper(node.initialize(this.resources));
+		}
 		this.nodeTypeCancel();
 		this.editNode(node);		
 	}
@@ -254,6 +248,8 @@ function weggeCreator() {
 	}
 	
 	this.nodeSave = function() {
+		this.nodeBeingEdited.applyJSON();
+		this.showTransformControls(this.nodeBeingEdited);
 		this.nodeCancel();
 	}
 		
@@ -275,9 +271,7 @@ function weggeCreator() {
 				element:this.nodeForm
 			}
 		);
-		if (this.nodeBeingEdited.wrapper && this.host3D && this.host3D.initialized) {
-			this.showTransformControls(this.nodeBeingEdited);
-		}		
+		this.showTransformControls(this.nodeBeingEdited);				
 	}
 	
 	this.levelNodeTree = this.ui.addContainer();
@@ -345,12 +339,15 @@ function weggeCreator() {
 	}
 	
 	this.showTransformControls = function( node ) {
-		this.hideTransformControls();
-		this.transformControls = new THREE.TransformControls( this.host3D.camera, this.ui.element[0] /*this.host3D.renderer.domElement*/ );
-		this.transformControls.addEventListener( 'change', this.onTransformControlsChangeCallback);
-		this.transformControls.attach( node.wrapper );
-		this.host3D.scene.add( this.transformControls );		
-		this.showInfo("\"T\" translate | \"Y\",\"Z\" rotate | \"U\" scale | \"+\" increase size | \"-\" decrease size, \"I\" world/local space");
+		if (node.wrapper && this.host3D && this.host3D.initialized) {
+			this.hideTransformControls();
+			this.transformControls = new THREE.TransformControls( this.host3D.camera, this.ui.element[0] /*this.host3D.renderer.domElement*/ );
+			this.transformControls.addEventListener( 'change', this.onTransformControlsChangeCallback);
+			this.transformControls.attach( node.wrapper );
+			this.transformControls.setSnap( 1 );
+			this.host3D.scene.add( this.transformControls );		
+			this.showInfo("\"T\" translate | \"Y\",\"Z\" rotate | \"U\" scale | \"+\" increase size | \"-\" decrease size, \"I\" world/local space");
+		}
 	}
 		
 	/* INIT */

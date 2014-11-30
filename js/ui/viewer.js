@@ -5,34 +5,23 @@ function weggeViewer() {
 	this.host3D = false;
 	this.controls = false;
 	
-	this.initHost3D = function() {
-		if (!this.host3D) {
-			this.host3D = new weggeHost3D();
-		}
-		
-		this.host3D.onAnimationFrame = _bind(this, this.animationFrame);
-		
-		if (this.level) {			
-			this.host3D.renderer.setClearColor( _coalesce(this.level.json.clearColor, 0x101010) );
-			if (this.level.json.ambientLight) {				
-				this.host3D.scene.add(new THREE.AmbientLight(this.level.json.ambientLight));
-			}
-			var level_object = this.level.initialize(this.resources);
-			if (level_object) {
-				this.host3D.scene.add(level_object);
-			}
-			
-			if (!this.controls) {
-				this.controls = new weggeControls({ element: document });
-				this.controls.resetToDefault();
-				this.controls.movementSpeed = 500;
-				this.controls.lookEnabled = false;
-				this.controls.movementEnabled = true;				
-			}
-			this.controls.initialize( this.host3D.camera, this.level.json.cameraLatitude, this.level.json.cameraLongitude );
-			this.host3D.camera.position.set(this.level.json.cameraPosition[0],this.level.json.cameraPosition[1],this.level.json.cameraPosition[2]);
-		}	
-	}	
+	this.ui = new weggeUI();
+	this.info = this.ui.addContainer().css({position:"absolute",bottom:"0px",right:"0px"}).hide();
+	
+	this.showInfo = function( text ) {
+		this.info.html( text ).show();
+	}
+	
+	this.hideInfo = function () {
+		this.info.hide();
+	}
+	
+	this.showInfo("ESC - select level to load.");
+	
+	this.resetUI = function() {		
+		this.levelLoadCancel();		
+		this.ui.removeOverlay();
+	}
 	
 	this.resetHost3D = function () {
 		this.controls.camera = false;
@@ -42,17 +31,30 @@ function weggeViewer() {
 		}
 	}
 	
+	this.onKeyUp = function ( e ) {
+		var key = e.keyCode ? e.keyCode : e.charCode;
+		//console.log("key:" + key);
+		switch( key ) {
+			case 27: /*ESC*/
+				this.loadLevelList();
+		}
+	}
+		
 	this.levelLoaded = function( data ) { 
 		//console.log("level loaded:");
 		//console.log(data);
-		this.level = new weggeLevel();
-		this.level.loadFromJSON(data.level_id, data.level_json);
-		var res = this.level.getRequiredResources();
-		if ((res.length > 0) && (!this.resources)) {
-			this.loadResources(res.join());
+		if (data.level_id) {
+			this.level = new weggeLevel();
+			this.level.loadFromJSON(data.level_id, data.level_json);
+			var res = this.level.getRequiredResources();
+			if ((res.length > 0) && (!this.resources)) {
+				this.loadResources(res.join());
+			} else {
+				this.start();
+			}
 		} else {
-			this.start();
-		}			
+			console.log( data );
+		}
 	}
 	
 	this.startLoadingLevel = function( level_id ) {
@@ -64,8 +66,54 @@ function weggeViewer() {
 		);		
 	}
 
+	this.selectLevel = function( level ) {
+		this.resetUI();
+		this.startLoadingLevel(level.level_id);		
+	}
+	
+	this.levelLoadCancel = function() {
+		if (this.levelList) {
+			this.levelList.remove();
+			this.levelList = false;
+			this.ui.removeOverlay();
+		}
+	}
+	
+	this.showLevelList = function( levels_json ) {
+		this.levelLoadCancel();
+		this.ui.addOverlay();
+		this.levelList = this.ui.addContainer()
+			.css({left:"150px",right:"150px",top:"170px",bottom:"120px",opacity:1,position:"fixed",zIndex:"99999999999999"});
+		
+		if (levels_json.length > 0) {
+			this.ui.addNodeList( levels_json, _bind(this, this.selectLevel), this.levelList ).css({margin:"auto"});
+		} else {
+			this.levelList.append("No levels available in weGGe database.");
+		}
+		
+		this.ui.addMenu( {
+				links: [
+							{title:'Cancel',onselect:_bind(this, this.levelLoadCancel)},
+						],
+				css:{top:0,left:0},
+				element:this.levelList
+			}
+		);
+	}
+	
 	this.reloadLevel = function() {		
-		this.startLoadingLevel(this.level.id);
+		this.resetUI();
+		if (this.level && this.level.id) {
+			this.startLoadingLevel(this.level.id);
+		} else {
+			console.log("No level loaded. Nothing  to reload.");
+		}
+	}
+	
+	this.loadLevelList = function() {
+		$.get("php/loadLevels.php",			
+			_bind(this, this.showLevelList)
+		);
 	}
 	
 	this.animationFrame = function(delta) {
@@ -74,13 +122,22 @@ function weggeViewer() {
 	}
 	
 	this.start = function() {
-		this.host3D.scene.add(this.level.initialize(this.resources));
-		this.host3D.onAnimationFrame = _bind(this, this.animationFrame);
-		this.controls = new weggeControls({ "camera":this.host3D.camera, element: document });
-		this.controls.resetToDefault();
-		this.controls.movementSpeed = 500;
-		this.controls.lookEnabled = this.controls.movementEnabled = true;
-		this.host3D.startAnimation();
+		if (this.level) {
+			this.resetHost3D();
+			this.host3D = new weggeHost3D();
+			this.level.initialize(this.host3D, this.resources);
+			this.host3D.onAnimationFrame = _bind(this, this.animationFrame);
+		
+			if (!this.controls) {
+				this.controls = new weggeControls({ "camera":this.host3D.camera, element: document });
+				this.controls.resetToDefault();
+				this.controls.movementSpeed = 500;
+				this.controls.lookEnabled = this.controls.movementEnabled = true;
+			}
+			
+			this.controls.initialize( this.host3D.camera, this.level.json.cameraLatitude, this.level.json.cameraLongitude );			
+			this.host3D.startAnimation();
+		}
 	}
 
 	/* RESOURCES */
@@ -98,7 +155,8 @@ function weggeViewer() {
 			_bind(this, this.resourcesLoaded)
 		);
 	}
-					
+		
+	document.addEventListener( 'keyup', _bind( this, this.onKeyUp ), false );
 }
 
 

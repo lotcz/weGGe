@@ -9,23 +9,24 @@ function weggeUI( element ) {
 		var form = $("<ul class=\"form\"></ul>").appendTo(parent);
 		for (var property in data) {
 			if ((!props)||($.inArray(property, props)>=0)) {
-				var item = $("<li class=\"form-item\"></li>");
-				item.append("<label for=\"" + property + "\">" + property + "</label>");
 				
-				(function(_this, _data, _property) {
-					if (_property != "children") {
-						if (_isObject(_data[_property])) {
-							_this.addFormItems( item, _data[_property]);
-						} else {
-							var input = $("<input type=\"text\" value=\"" + _data[_property] + "\"></input>")
-								.change( function() { 
-									_data[_property] = $( this ).val();
-								});
-							item.append(input);
-						}
-					}
-				})(this, data, property);
-				
+				if (property != "children") {
+					var item;				
+					(function(_this, _data, _property) {
+							item = $("<li class=\"form-item\"></li>");
+							item.append("<label for=\"" + property + "\">" + property + "</label>");
+							if (_isObject(_data[_property])) {
+								_this.addFormItems( item, _data[_property]);
+							} else {
+								var input = $("<input type=\"text\" value=\"" + _data[_property] + "\"></input>")
+									.change( function() { 
+										_data[_property] = $( this ).val();
+									});
+								item.append(input);
+							}
+						
+					})(this, data, property);
+				}
 				form.append(item);
 			}
 		}
