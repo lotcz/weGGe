@@ -1,4 +1,5 @@
-//weggeCreator.prototype = new weggeViewer();
+WEGGE_CREATOR_MODE = true;
+var WEGGE_CREATOR_HELPERS = [];
 
 function weggeCreator() {
 	this.base = weggeViewer;
@@ -22,7 +23,15 @@ function weggeCreator() {
 					
 			this.resetHost3D();
 			this.host3D = new weggeHost3D();
+			WEGGE_CREATOR_HELPERS = [];
 			this.level.initialize(this.host3D, this.resources);
+			//this.host3D.scene.fog	= new THREE.FogExp2( 0x000000, 0.001 );
+
+			if (WEGGE_CREATOR_HELPERS.length > 0) {
+				for (var i = WEGGE_CREATOR_HELPERS.length-1; i >= 0; i--) {
+					this.host3D.scene.add(WEGGE_CREATOR_HELPERS[i]);
+				}
+			}
 			this.host3D.onAnimationFrame = _bind(this, this.animationFrame);
 		
 			if (!this.controls) {
@@ -229,6 +238,7 @@ function weggeCreator() {
 		this.nodeTypeCancel();
 		this.nodeTypeForm = this.ui.addContainer();
 		this.nodeTypeForm.css({top:"70px",display:"inline-block",position:"absolute",paddingRight:"15px",paddingBottom:"10px",paddingLeft:"15px"});
+		weggeNode.prototype.availableTypes.sort();
 		this.ui.addNodeList( weggeNode.prototype.availableTypes, _bind(this, this.nodeTypeSelected), this.nodeTypeForm );
 		this.ui.addMenu( {
 				links: [

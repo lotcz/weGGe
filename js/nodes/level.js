@@ -35,7 +35,7 @@ weggeLevel.prototype.buildNodeAnimatedArray = function(node) {
 		this.animated.push(node);
 	}
 	if (node.children) {
-		for ( var i = 0, max = this.children.length; i < max; i++) {
+		for ( var i = 0, max = node.children.length; i < max; i++) {
 			this.buildNodeAnimatedArray(node.children[i]);
 		}
 	}
@@ -45,7 +45,7 @@ weggeLevel.prototype.buildAnimatedArray = function() {
 	this.animated = [];
 	if (this.children) {
 		for ( var i = 0, max = this.children.length; i < max; i++) {
-			this.buildNodeAnimatedArray(node.children[i]);
+			this.buildNodeAnimatedArray(this.children[i]);
 		}
 	}	
 }
@@ -71,6 +71,7 @@ weggeLevel.prototype.initialize = function ( host3D, resources ) {
 	this.host3D = host3D;	
 	this.initializeChildren(resources);
 	this.applyJSON();
+	this.buildAnimatedArray();
 	this.initialized = true;
 	this.host3D.scene.add(this.wrapper);
 }

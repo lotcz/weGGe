@@ -1,3 +1,5 @@
+var WEGGE_CREATOR_MODE = false;
+
 function weggeViewer() {
 	
 	this.level = false;
