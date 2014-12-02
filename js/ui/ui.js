@@ -9,7 +9,6 @@ function weggeUI( element ) {
 		var form = $("<ul class=\"form\"></ul>").appendTo(parent);
 		for (var property in data) {
 			if ((!props)||($.inArray(property, props)>=0)) {
-				
 				if (property != "children") {
 					var item;				
 					(function(_this, _data, _property) {
@@ -46,18 +45,21 @@ function weggeUI( element ) {
 		return menu;
 	}
 	
-	this.addOverlay = function () {
-		if (!this.overlay) {
-			this.overlay = $("<div class=\"overlay\"></div>").appendTo(this.element);
+	this.addCleaner = function(element) {
+		var cleaner = $("<div class=\"cleaner\"></div>");
+		if (element) {
+			cleaner.appendTo(element);
 		}
+		return cleaner;
+	}
+	
+	this.addOverlay = function (element) {
+		this.overlay = $("<div class=\"overlay\"></div>").appendTo(_coalesce(element,this.element));
 		return this.overlay;
 	}
 
 	this.removeOverlay = function() {
-		if (this.overlay) {
-			this.overlay.remove();
-			this.overlay = false;
-		}
+		$(".overlay").remove();
 	}
 	
 	this.addNode = function( node, onselect, element ) {

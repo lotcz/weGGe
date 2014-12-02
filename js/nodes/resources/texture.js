@@ -1,7 +1,12 @@
-weggeTexture.prototype = new weggeResource();
-weggeTexture.prototype.constructor = weggeResource;    
+weggeTexture.prototype = new weggeMaterial();
+weggeTexture.prototype.constructor = weggeTexture;    
 
 function weggeTexture() {
+	weggeMaterial.call(this);
+	this.initialized = false;
+	this.json.type = "Texture";
+	this.json.name = "--texture--";
+	this.json.path = "";
 }
 
 weggeTexture.prototype.initialize = function ( onInitialized ) {	
@@ -16,22 +21,12 @@ weggeTexture.prototype.initialize = function ( onInitialized ) {
 	})(this);	
 }
 
-weggeTexture.prototype.renderHUDList = function ( onclick ) {
-	var wrapper = $("<div class=\"list-item\"></div>");
-	var link = $("<div class=\"hud-menu-link\"></div>").appendTo(wrapper);
-	link.append("<div class=\"column column-id\">" + this.id + "</div>");
-	link.append("<div class=\"column column-type\">" + this.json.type + "</div>");
-	link.append("<div class=\"column column-desc\">" + this.json.path + "</div>");
-	if (onclick) {
-		link.bind( "click", onclick);
-	}
-	return wrapper;
-}	
-
-weggeTexture.prototype.renderHUDPreview = function ( ) {
+weggeTexture.prototype.renderPreview = function ( ) {
 	if (this.material) {		
 		var preview = new objectPlane();
 		preview.initialize( this );
 		return preview;
 	}	
 }	
+
+weggeResource.prototype.availableTypes.push("Texture");

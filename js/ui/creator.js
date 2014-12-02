@@ -5,16 +5,6 @@ function weggeCreator() {
 	this.base = weggeViewer;
 	this.base();
 	
-	this.pause = function() {
-		if (this.host3D) {
-			if (this.host3D.animationPaused) {	
-				this.host3D.startAnimation();
-			} else {
-				this.host3D.stopAnimation();
-			}
-		}
-	}
-	
 	this.start = function() {
 		if (this.level && this.resources && this.resources.initialized) {
 			this.resetUI();
@@ -85,11 +75,7 @@ function weggeCreator() {
 			}
 		}
 	}
-	
-	this.loadSelectedLevel = function() {
-	
-	}
-	
+
 	this.selectLevel = function( level ) {
 		this.resetUI();
 		this.startLoadingLevel(level.level_id);		
@@ -109,7 +95,6 @@ function weggeCreator() {
 		
 		this.ui.addMenu( {
 				links: [
-							{title:'Load',onselect:_bind(this, this.loadSelectedLevel)},
 							{title:'Cancel',onselect:_bind(this, this.levelLoadCancel)},
 						],
 				css:{top:0,left:0},
@@ -161,26 +146,11 @@ function weggeCreator() {
 		}
 	}
 		
-	/* RESOURCES */
-	
-	this.resourceSaved = function( data ) {
-		console.log("Resource saved:" + data); 
-		if (!isNaN(data)) {
-			this.savingResource.id = parseInt(data);
-		}
-	}
-	
-	this.saveResource = function( res ) {
-		this.savingResource = res;
-		$.post("php/saveResource.php", { "resource_id":res.resource_id, "resource_json":res.getJSON() }, 
-			_bind(this, this.resourceSaved)
-		);
-	}
-		
 	this.resetUI = function() {
 		if (this.nodeForm) {
 			this.nodeForm.remove();
 		}		
+		this.resourcesManager.hide();
 		this.nodeTypeCancel();
 		this.levelLoadCancel();
 		this.levelNodeTree.empty();
@@ -188,24 +158,25 @@ function weggeCreator() {
 		this.ui.removeOverlay();
 	}
 	
-	/* MENU */
-		
-	this.menuContainer = this.ui.addContainer();
-	this.menuContainer.css({height:"55px",paddingLeft:"150px",paddingTop:"15px"}).addClass("main-menu");
-	this.ui.addMenu( {
-			links: [
-						{title:'New',onselect:_bind(this, this.newLevel)},
-						{title:'Load',onselect:_bind(this, this.loadLevelList)},
-						{title:'Save',onselect:_bind(this, this.saveLevel)},
-						{title:'Delete',onselect:_bind(this, this.deleteLevel)},
-						{title:'Reload',onselect:_bind(this, this.reloadLevel)},
-						{title:'Pause',onselect:_bind(this, this.pause)},
-					],
-			css:{top:0,left:0},
-			element:this.menuContainer
+	/* RESOURCES */
+	this.resourcesManager = new weggeResourcesManager( { 
+			ui:this.ui,
+			resources:this.resources,
+			onResourceSelected: _bind(this, this.resourceSelected)
 		}
 	);
 	
+	this.openResourcesManager = function() {
+		if (this.resources) {
+			if (this.host3D) {
+				this.host3D.stopAnimation();
+			}
+			this.resourcesManager.show(this.resources);
+		} else {
+			console.log("Resources are not initialized. Cannot open resource manager.");
+		}
+	}
+		
 	/* NODES */
 	
 	this.nodeTypeSelected = function ( ntype ) {
@@ -284,9 +255,6 @@ function weggeCreator() {
 		this.showTransformControls(this.nodeBeingEdited);				
 	}
 	
-	this.levelNodeTree = this.ui.addContainer();
-	this.levelNodeTree.css({top:"70px",left:"0px",minWidth:"250px",maxWidth:"50%",width:"auto",display:"inline-block"/*,height:"100%"*/});
-	
 	this.addTreeNode = function( node ) {
 		var el = $("<li></li>");
 		var fnc = function () {
@@ -360,6 +328,30 @@ function weggeCreator() {
 		}
 	}
 		
+	/* MENU */
+		
+	this.menuContainer = this.ui.addContainer();
+	this.menuContainer.css({height:"55px",paddingLeft:"150px",paddingTop:"15px"}).addClass("main-menu");
+	this.ui.addMenu( {
+			links: [
+						{title:'New',onselect:_bind(this, this.newLevel)},
+						{title:'Load',onselect:_bind(this, this.loadLevelList)},
+						{title:'Save',onselect:_bind(this, this.saveLevel)},
+						{title:'Delete',onselect:_bind(this, this.deleteLevel)},
+						{title:'Reload',onselect:_bind(this, this.reloadLevel)},
+						{title:'Resources',onselect:_bind(this, this.openResourcesManager)},
+						{title:'Pause',onselect:_bind(this, this.pause)},
+					],
+			css:{top:0,left:0},
+			element:this.menuContainer
+		}
+	);
+		
+	/* NODE TREE */
+	
+	this.levelNodeTree = this.ui.addContainer();
+	this.levelNodeTree.css({top:"70px",left:"0px",minWidth:"250px",maxWidth:"50%",width:"auto",display:"inline-block"/*,height:"100%"*/});
+	
 	/* INIT */
 	this.loadResources();
 }

@@ -10,6 +10,20 @@ function weggeViewer() {
 	this.ui = new weggeUI();
 	this.info = this.ui.addContainer().css({position:"absolute",bottom:"0px",right:"0px"}).hide();
 	
+	this.toggleRendering = function() {
+		if (this.host3D) {
+			if (this.host3D.animationPaused) {	
+				this.host3D.startAnimation();
+			} else {
+				this.host3D.stopAnimation();
+			}
+		}
+	}
+	
+	this.toggleLook = function() {
+		this.controls.lookEnabled = !this.controls.lookEnabled;
+	}
+	
 	this.showInfo = function( text ) {
 		this.info.html( text ).show();
 	}
