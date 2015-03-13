@@ -35,6 +35,8 @@ function weggeCreator() {
 			this.controls.initialize( this.host3D.camera, this.level.json.cameraLatitude, this.level.json.cameraLongitude );			
 			this.host3D.startAnimation();
 		
+		} else {
+			console.log("Level or resources not initialized.");	
 		}
 	}
 	
@@ -121,7 +123,7 @@ function weggeCreator() {
 	this.levelSaved = function (data) { 		
 		if (!isNaN(data)) {
 			this.level.id = parseInt(data);
-			console.log("Level " + this.level.id + " saved.");
+			console.log("Level saved. ID=" + this.level.id);
 		} else {
 			console.log("Level not saved successfully:" + data); 
 		}

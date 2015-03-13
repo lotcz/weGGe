@@ -10,6 +10,11 @@ weggeResource.prototype.loadFromJSON = function ( id, json ) {
 	this.id = id;
 }
 
+weggeResource.prototype.initialize = function ( onInit ) {
+	this.initialized = true;
+	onInit();
+}
+
 weggeResource.prototype.availableTypes = [];
 
 weggeMaterial.prototype = new weggeResource();

@@ -39,7 +39,7 @@ function _append( arr1, arr2 ) {
 	} 
 }
 
-// adds an element to the array if it does not already exist using a comparer
+// adds an element to the array if it does not already exist
 function _appendIfNotExist(arr1, arr2) { 
     for ( var i = 0, max = arr2.length; i < max; i++) {
 		if (arr1.indexOf(arr2[i]) == -1) {
@@ -62,7 +62,6 @@ function _random( a, b ) {
 function _prob( n ) {
 	return (Math.random() <= (n/100));
 }
-
 
 function _dynamicSort(property) {
     var sortOrder = 1;

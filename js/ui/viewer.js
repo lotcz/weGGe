@@ -57,13 +57,13 @@ function weggeViewer() {
 	}
 		
 	this.levelLoaded = function( data ) { 
-		//console.log("level loaded:");
-		//console.log(data);
+		console.log("level loaded:");
+		console.log(data);
 		if (data.level_id) {
 			this.level = new weggeLevel();
 			this.level.loadFromJSON(data.level_id, data.level_json);
 			var res = this.level.getRequiredResources();
-			if ((res.length > 0) && (!this.resources)) {
+			if (res.length > 0) {
 				this.loadResources(res.join());
 			} else {
 				this.start();

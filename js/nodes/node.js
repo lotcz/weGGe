@@ -1,3 +1,5 @@
+weggeNode.prototype.availableTypes = [];
+
 function weggeNode() {
 	this.json = {};
 	this.json.name = "--node--";
@@ -105,5 +107,3 @@ weggeNode.prototype.initialize = function ( resources ) {
 	this.applyJSON();
 	this.initialized = true;
 }
-
-weggeNode.prototype.availableTypes = ["Node"];

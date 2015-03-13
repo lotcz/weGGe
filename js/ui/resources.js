@@ -28,7 +28,7 @@ function weggeResourcesManager( params ) {
 			var list = $("<table class=\"list\"></table>").appendTo(this.resourcesList);		
 			var fn = _bind(this, this.editResource);
 			for (var i = 0, max = this.resources.children.length; i < max; i++) {
-				this.ui.addNode( this.resources.children[i].json, fn, list );
+				this.ui.addNode( this.resources.children[i].json, fn, list, this.resources.children[i].id + " " + this.resources.children[i].json.name + " " + this.resources.children[i].json.type );
 			}
 		} else {
 			this.resourcesList.append("No resources available in weGGe database.");

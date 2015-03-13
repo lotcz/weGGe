@@ -16,6 +16,12 @@ weggeTexture.prototype.initialize = function ( onInitialized ) {
 				_this.material = new THREE.MeshLambertMaterial( { color: 0xffffff, side: THREE.DoubleSide, map:texture } );	
 				_this.initialized = true;
 				onInitialized();
+			},
+			 function ( data ) {
+				console.log("Cannot load texture " + _this.json.path);
+				console.log(data);
+				_this.initialized = true;
+				onInitialized()
 			}
 		);
 	})(this);	

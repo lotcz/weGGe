@@ -62,7 +62,7 @@ function weggeUI( element ) {
 		$(".overlay").remove();
 	}
 	
-	this.addNode = function( node, onselect, element ) {
+	this.addNode = function( node, onselect, element, title ) {
 		var row;
 		row = $("<tr></tr>").appendTo(element);
 		var fnc = function () {
@@ -70,8 +70,12 @@ function weggeUI( element ) {
 		}
 		row.click(fnc);				
 		if (_isObject(node)) {
-			for (var property in node) {
-				$("<td></td>").append(node[property]).appendTo(row);				
+			if (title) {
+				$("<td></td>").append(title).appendTo(row);
+			} else {
+				for (var property in node) {					
+					$("<td></td>").append(node[property]).appendTo(row);
+				}
 			}
 		} else {
 			$("<td></td>").append(node).appendTo(row);				

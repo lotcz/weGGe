@@ -43,7 +43,7 @@ weggeBox.prototype.initialize = function() {
 	var geometry = new THREE.BoxGeometry( this.json.width, this.json.height, this.json.depth );
 	var color = new THREE.Color();
 	color.setStyle(this.json.color);
-	this.wrapper = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({color:color}) );
+	this.wrapper = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({color:color,ambient:color}) );
 	this.applyBasic();
 	return this.wrapper;
 }
