@@ -12,7 +12,10 @@ function weggeResourcesManager( params ) {
 			this.container = this.ui.addContainer().css({left:"0px",right:"0px",top:"70px",bottom:"0px",opacity:1,position:"fixed",zIndex:"99999999999999"});
 			this.innerContainer = this.ui.addContainer(this.container).addClass("border");			
 			this.resourcesList = this.ui.addContainer(this.innerContainer).addClass("column half");
-			this.resourceForm = this.ui.addContainer(this.innerContainer).addClass("column half");			
+			this.resourceForm = this.ui.addContainer(this.innerContainer).addClass("column half");
+					
+			this.ui.addCleaner(this.innerContainer);
+					
 			this.ui.addMenu( {
 					links: [
 								{title:'New resource',onselect:_bind(this, this.newResource)},
@@ -22,13 +25,15 @@ function weggeResourcesManager( params ) {
 					element:this.innerContainer 
 				}
 			);
+			
+			this.ui.addCleaner(this.innerContainer);
 		}
 		this.resourcesList.empty();
 		if (this.resources.children.length > 0) {
 			var list = $("<table class=\"list\"></table>").appendTo(this.resourcesList);		
 			var fn = _bind(this, this.editResource);
 			for (var i = 0, max = this.resources.children.length; i < max; i++) {
-				this.ui.addNode( this.resources.children[i].json, fn, list, this.resources.children[i].id + " " + this.resources.children[i].json.name + " " + this.resources.children[i].json.type );
+				this.ui.addNode( this.resources.children[i], fn, list, ["id","json","name","type","path"] );
 			}
 		} else {
 			this.resourcesList.append("No resources available in weGGe database.");

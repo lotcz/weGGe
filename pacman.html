@@ -1,0 +1,169 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link href="ui.css" rel="stylesheet"/>
+		<title>weGGe PACMAN</title>
+	</head>
+	
+	<body>	
+	</body>
+
+	<script src="lib/three.min.js" language="javascript"></script>	
+	<script src="lib/stats.min.js" language="javascript"></script>
+	<script src="lib/jquery.min.js" language="javascript"></script>
+	<script src="lib/three.min.js" language="javascript"></script>	
+	<script src="lib/helvetiker_regular.typeface.js" language="javascript"></script>
+	
+	<script src="lib/physi.js" language="javascript"></script>	
+	<script>
+		'use strict';
+
+		Physijs.scripts.worker = 'lib/physijs_worker.js';
+		Physijs.scripts.ammo = 'ammo.js';
+	</script>
+	
+	<script src="js/tools.js" language="javascript"></script>
+	<script src="js/host3d.js" language="javascript"></script>
+	<script src="js/controls.js" language="javascript"></script>
+	<script src="js/textSprites.js" language="javascript"></script>
+	
+	<script src="js/nodes/node.js" language="javascript"></script>
+	<script src="js/nodes/objects/object.js" language="javascript"></script>
+	<script src="js/nodes/level.js" language="javascript"></script>
+	<script src="js/nodes/objects/axis.js" language="javascript"></script>	
+	<script src="js/nodes/objects/basic.js" language="javascript"></script>
+	<script src="js/nodes/objects/lights.js" language="javascript"></script>
+	<script src="js/nodes/objects/plane.js" language="javascript"></script>
+	<script src="js/nodes/objects/mesh.js" language="javascript"></script>
+	<script src="js/nodes/resources/resources.js" language="javascript"></script>
+	<script src="js/nodes/resources/resource.js" language="javascript"></script>
+	<script src="js/nodes/resources/model.js" language="javascript"></script>
+	<script src="js/nodes/resources/texture.js" language="javascript"></script>
+
+	<script src="js/ui/ui.js" language="javascript"></script>
+	<script src="js/ui/viewer.js" language="javascript"></script>
+	
+	<script>
+	
+		var viewer;
+	
+		function initEventHandling() {
+			var _vector = new THREE.Vector3, _v3 = new THREE.Vector3, mouse_position = new THREE.Vector3, block_offset = new THREE.Vector3,
+				handleMouseDown, handleMouseMove, handleMouseUp, selected_block = false,
+				camera = viewer.host3D.camera, intersections,
+				intersect_plane;
+				
+			intersect_plane = new THREE.Mesh(
+					new THREE.PlaneGeometry( 1500, 1500 ),
+					new THREE.MeshBasicMaterial({ opacity: 0, transparent: true })
+				);
+			
+			var plane = viewer.level.findNodeByName("plane");
+			if (plane) {
+				intersect_plane.geometry = plane.wrapper.geometry;
+				intersect_plane.position.copy(plane.wrapper.position);
+				intersect_plane.scale.copy(plane.wrapper.scale);
+				intersect_plane.rotation.copy(plane.wrapper.rotation);	
+				//plane.destroy();
+			}
+			
+			viewer.host3D.scene.add( intersect_plane );
+		
+			handleMouseDown = function( evt ) {
+				_vector.set(
+					( evt.clientX / window.innerWidth ) * 2 - 1,
+					-( evt.clientY / window.innerHeight ) * 2 + 1,
+					1
+				);
+				
+				var raycaster = new THREE.Raycaster();
+				raycaster.setFromCamera( _vector, camera );
+				intersections = raycaster.intersectObjects( viewer.level.selectable );
+				
+				if ( intersections.length > 0 ) {
+					selected_block = intersections[0].object;
+					
+					_vector.set( 0, 0, 0 );
+					selected_block.setAngularFactor( _vector );
+					selected_block.setAngularVelocity( _vector );
+					selected_block.setLinearFactor( _vector );
+					selected_block.setLinearVelocity( _vector );
+
+					mouse_position.copy( intersections[0].point );
+					block_offset.subVectors( selected_block.position, mouse_position );
+					
+					intersect_plane.position.z = mouse_position.z;
+				}
+			};
+			
+			handleMouseMove = function( evt ) {
+				
+				var i, scalar;
+				
+				if ( selected_block ) {
+					
+					_vector.set(
+						( evt.clientX / window.innerWidth ) * 2 - 1,
+						-( evt.clientY / window.innerHeight ) * 2 + 1,
+						1
+					);
+					var raycaster = new THREE.Raycaster();
+					raycaster.setFromCamera( _vector, camera );
+					intersections = raycaster.intersectObject( intersect_plane );
+					if (intersections.length > 0) {
+						mouse_position.copy( intersections[0].point );
+					}
+				}
+				
+			};
+			
+			handleMouseUp = function( evt ) {
+				
+				if ( selected_block) {
+					_vector.set( 1, 1, 1 );
+					selected_block.setAngularFactor( _vector );
+					selected_block.setLinearFactor( _vector );					
+					selected_block = false;
+				}
+				
+			};
+						
+			document.addEventListener( 'mousedown', handleMouseDown );
+			document.addEventListener( 'mousemove', handleMouseMove );
+			document.addEventListener( 'mouseup', handleMouseUp );
+			
+			viewer.host3D.scene.addEventListener(
+				'update',
+				function() {
+
+					if ( selected_block ) {
+						
+						_v3.copy( mouse_position ).add( block_offset ).sub( selected_block.position ).multiplyScalar( 5 );
+						_v3.z = -1;
+						selected_block.setLinearVelocity( _v3 );
+						
+						// Reactivate all of the blocks
+						_v3.set( 0, 0, 0 );
+						for ( var _i = 0; _i < viewer.level.selectable.length; _i++ ) {
+							viewer.level.selectable[_i].applyCentralImpulse( _v3 );
+						}
+					}
+
+					//scene.simulate( undefined, 1 );
+					
+				}
+			);
+		}
+		
+		$(function () {
+			viewer = new weggeViewer();
+			viewer.onLevelLoaded = initEventHandling;
+			viewer.startLoadingLevel(23);
+			
+		});
+		
+	</script>
+		
+</html>
+

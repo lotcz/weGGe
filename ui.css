@@ -11,6 +11,11 @@ body {
 	font-size:4mm;
 }
 
+.cleaner {
+	clear:both;
+	display:block;
+}
+
 .column {
 	display:inline-block;
 	float:left;
@@ -105,13 +110,14 @@ body {
 }
 
 #ui .form-item input {
-	width:100px;
+	width:70%;
 	font-family:monospace;
 	display:inline-block;
+	margin:1px;
 }
 
 #ui .form-item label {
-	width:100px;
+	width:25%;
 	display:inline-block;
 }
 
@@ -132,6 +138,9 @@ body {
 
 #ui .list td{
 	cursor:pointer;
+	padding:3px;
+	margin:1px;
+	background-color:#404040;
 }
 
 #ui .list tr:hover, #ui .list td:hover {

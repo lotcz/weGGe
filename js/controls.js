@@ -29,13 +29,34 @@ function weggeControls( params ) {
 		if (this.camera) {
 			this.lat = _coalesce(lat, 0);
 			this.lon = _coalesce(lon, 0);
-			this.phi = THREE.Math.degToRad( 90 - this.lat );
-			this.theta = THREE.Math.degToRad( this.lon );
-			this.target.x = this.camera.position.x + 100 * Math.sin( this.phi ) * Math.cos( this.theta );
-			this.target.y = this.camera.position.y + 100 * Math.cos( this.phi );
-			this.target.z = this.camera.position.z + 100 * Math.sin( this.phi ) * Math.sin( this.theta );
-			this.camera.lookAt( this.target );	
+			this.updateCamera();
 		}
+	}
+	
+	this.updateCamera = function() {
+		this.phi = THREE.Math.degToRad( 90 - this.lat );
+		this.theta = THREE.Math.degToRad( this.lon );
+		this.target.x = this.camera.position.x + 100 * Math.sin( this.phi ) * Math.cos( this.theta );
+		this.target.y = this.camera.position.y + 100 * Math.cos( this.phi );
+		this.target.z = this.camera.position.z + 100 * Math.sin( this.phi ) * Math.sin( this.theta );
+		this.camera.lookAt( this.target );	
+	}
+	
+	
+	this.lookAt = function(v) {
+	/*
+			
+			var sinPhi = 1 / ((v.y - this.camera.position.y) / 100);			
+			var cosTheta = (v.x - this.camera.position.x) / (100 * sinPhi);
+			
+			v.z = this.camera.position.z + 100 * Math.sin( this.phi ) * Math.sin( this.theta );
+			this.phi = 1 / sinPhi;
+			this.theta = 1 / cosTheta;
+			this.lon = THREE.Math.radToDeg(this.theta)
+			this.phi = THREE.Math.degToRad( 90 - this.lat );
+	this.lat = 
+			
+			*/
 	}
 	
 	this.reset = this.initialize;
@@ -96,30 +117,25 @@ function weggeControls( params ) {
 				case 82: /*R*/ this.moveUp = false; break;
 				case 70: /*F*/ this.moveDown = false; break;				
 			}
-		}
+		}		
 		
-		switch( key ) {
-			case 32: /* space */
-			case 80: /*P*/ this.lookEnabled=!this.lookEnabled;break;
-		}
 	};
 
+	this.toggleLook = function() {
+		this.lookEnabled = !this.lookEnabled; 
+		this.stateChanged();
+	}
+	
 	this.animationFrame = function( delta ) {
 
 		if (this.lookEnabled) {
 			this.lat -= this.mouseY * this.vertSpeed * delta;
 			if (this.vertLockEnabled) this.lat = Math.max( this.vertMin , Math.min( this.vertMax, this.lat ) );
-			this.phi = THREE.Math.degToRad( 90 - this.lat );
-		
+			
 			this.lon += this.mouseX * this.horizSpeed * delta;
 			if (this.horizLockEnabled) this.lon = Math.max( this.horizMin , Math.min( this.horizMax, this.lon ) );
-			this.theta = THREE.Math.degToRad( this.lon );
-
-			this.target.x = this.camera.position.x + 100 * Math.sin( this.phi ) * Math.cos( this.theta );
-			this.target.y = this.camera.position.y + 100 * Math.cos( this.phi );
-			this.target.z = this.camera.position.z + 100 * Math.sin( this.phi ) * Math.sin( this.theta );
-
-			this.camera.lookAt( this.target );
+			
+			this.updateCamera();
 		}
 		
 		if (this.movementEnabled) {
@@ -137,6 +153,12 @@ function weggeControls( params ) {
 	
 	}
 		
+	this.stateChanged = function() {
+		if (this.onControlsStateChanged) {
+			this.onControlsStateChanged();
+		}
+	}
+	
 	this.resetToDefault = function() {		
 		this.lookEnabled = true;
 		this.movementEnabled = true;

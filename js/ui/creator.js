@@ -23,26 +23,90 @@ function weggeCreator() {
 				}
 			}
 			this.host3D.onAnimationFrame = _bind(this, this.animationFrame);
+			this.host3D.onHost3DStateChanged = _bind(this, this.host3DStateChanged);
 		
 			if (!this.controls) {
 				this.controls = new weggeControls({ "camera":this.host3D.camera, element: document });
 				this.controls.resetToDefault();
-				this.controls.movementSpeed = 500;
-				this.controls.lookEnabled = false;
+				this.controls.movementSpeed = 500;				
 				this.controls.movementEnabled = true;
+				this.controls.onControlsStateChanged = _bind(this, this.controlsStateChanged);
 			}
 			
 			this.controls.initialize( this.host3D.camera, this.level.json.cameraLatitude, this.level.json.cameraLongitude );			
-			this.host3D.startAnimation();
-		
+			
+			this.controls.lookEnabled = this.level.json.creator.lookEnabled;
+			this.host3D.renderingPaused = this.level.json.creator.renderingPaused;
+			this.host3D.animationPaused = this.level.json.creator.animationPaused;
+			this.host3D.physicsPaused = this.level.json.creator.physicsPaused;
+			
+			this.updateMenuButtonsHost();
+			this.updateMenuButtonsControls();
+			
+			if (!this.level.json.creator.renderingPaused) {
+				this.host3D.startRendering();
+			}
+			
 		} else {
 			console.log("Level or resources not initialized.");	
+		}
+		this.ui.hideLoading();
+	}
+	
+	this.onKeyUp = function ( e ) {
+		var key = e.keyCode ? e.keyCode : e.charCode;
+
+		switch( key ) {
+			case 32: /* space */
+				if (this.controls) {
+					this.controls.toggleLook();
+				}
+			break;
+		}
+	};
+	
+	document.addEventListener( 'keyup', _bind( this, this.onKeyUp ), false );
+	
+	this.host3DStateChanged = function() {
+		this.updateMenuButtonsHost();
+		if (this.level) {
+			if (!this.level.json.creator) {
+				this.level.json.creator = {};
+			}
+			this.level.json.creator.renderingPaused = _boolToInt(this.host3D.renderingPaused);
+			this.level.json.creator.animationPaused = _boolToInt(this.host3D.animationPaused);
+			this.level.json.creator.physicsPaused = _boolToInt(this.host3D.physicsPaused);
+		}
+	}
+	
+	this.controlsStateChanged = function() {
+		this.updateMenuButtonsControls();
+		if (this.level) {
+			if (!this.level.json.creator) {
+				this.level.json.creator = {};
+			}
+			this.level.json.creator.lookEnabled = _boolToInt(this.controls.lookEnabled);
 		}
 	}
 	
 	/* LEVEL */
 	
+	this.levelLoaded = function( data ) { 
+		console.log("level loaded:");
+		console.log(data);
+		this.ui.showLoading("Initializing...");
+		if (data.level_id) {
+			this.level = new weggeLevel();
+			this.level.loadFromJSON(data.level_id, data.level_json);			
+			this.start();			
+		} else {
+			console.log( data );
+		}
+	}
+	
 	this.startLoadingLevel = function( level_id ) {
+		this.loadResources();
+		this.ui.showLoading();
 		this.resetHost3D();	
 		$.get("php/loadLevel.php",
 			{level_id: level_id},
@@ -62,9 +126,9 @@ function weggeCreator() {
 	}
 	
 	this.levelDeleted = function() {
+		this.resetUI();	
 		this.resetHost3D();
-		this.level = false;
-		this.resetUI();		
+		this.level = false;			
 	}
 	
 	this.deleteLevel = function() {
@@ -236,24 +300,44 @@ function weggeCreator() {
 		this.nodeCancel();
 	}
 		
-	this.editNode = function( node, onsave ) {		
+	this.renderNodeForm = function(node, onsave) {
+		this.nodeBeingEdited  = node;
 		this.nodeCancel();
-		this.nodeTypeCancel();
-		this.nodeBeingEdited = node;
+		this.nodeTypeCancel();		
 		$(".selected", this.levelNodeTree).removeClass("selected");
 		$("a:first",this.nodeBeingEdited.treeContainer).addClass("selected");
 		this.nodeForm = this.ui.addContainer();
-		this.nodeForm.css({top:"70px",display:"inline-block",position:"absolute",paddingRight:"15px",paddingBottom:"10px"});
+		this.nodeForm.css({top:"70px",display:"inline-block",width:"450px",position:"absolute",paddingRight:"15px",paddingBottom:"10px",maxHeight:"85%",overflow:"auto"});
 		this.ui.addFormItems( this.nodeForm, node.json );
 		this.ui.addMenu( {
 				links: [
-							{title:'Save',onselect:_coalesce(onsave, _bind(this, this.nodeSave))},
+							{title:'Save',onselect: _coalesce(onsave, _bind(this, this.nodeSave))},
+							{title:'Look at',onselect: _bind(this, this.lookAt)},
 							{title:'Cancel',onselect:_bind(this, this.nodeCancel)},
 						],
 				css:{top:0,left:0},
 				element:this.nodeForm
 			}
 		);
+	}
+	
+	this.lookAt = function() {
+		this.controls.lookAt(this.nodeBeingEdited.wrapper.position);		
+	}
+	
+	this.cloneNode = function() {	
+		if (this.nodeBeingEdited && (this.nodeBeingEdited !== this.level)) {
+			this.nodeSave();
+			var clone = this.nodeBeingEdited.clone();
+			this.host3D.scene.add(clone.initialize(this.resources));
+			this.levelTreeNode.append(this.addTreeNode(clone));
+			this.level.children.push( clone );			
+		}
+	}
+	
+	this.editNode = function( node, onsave ) {	
+		this.nodeBeingEdited = node;	
+		this.renderNodeForm( this.nodeBeingEdited, onsave  )
 		this.showTransformControls(this.nodeBeingEdited);				
 	}
 	
@@ -281,16 +365,19 @@ function weggeCreator() {
 		return el;
 	}
 	
+	this.levelTreeNode = false;
+	
 	this.fillLevelTree = function () {		
 		if (this.level) {
 			var el = $("<ul class=\"node-tree\"></ul>").appendTo(this.levelNodeTree);
-			el.append( this.addTreeNode(this.level) );
+			this.levelTreeNode = this.addTreeNode(this.level);
+			el.append( this.levelTreeNode );
 			/* node menu */
 			this.ui.addMenu( {
 					links: [
 						{title:'ADD',onselect:_bind(this, this.newNode)},
 						{title:'REMOVE',onselect:_bind(this, this.removeNode)},
-						{title:'Go to',onselect:_bind(this, this.saveLevel)}
+						{title:'CLONE',onselect:_bind(this, this.cloneNode)}
 					],
 					css:{fontSize:"4mm", marginTop:"10px", marginBottom:"10px"},
 					element:this.levelNodeTree
@@ -304,6 +391,7 @@ function weggeCreator() {
 	this.onTransformControlsChange = function ( event ) {
 		if (event && event.target && event.target.object && this.nodeBeingEdited && this.nodeBeingEdited.basicPropsEdited) {
 			this.nodeBeingEdited.basicPropsEdited();
+			this.renderNodeForm(this.nodeBeingEdited);
 		}
 	}
 	
@@ -342,18 +430,40 @@ function weggeCreator() {
 						{title:'Delete',onselect:_bind(this, this.deleteLevel)},
 						{title:'Reload',onselect:_bind(this, this.reloadLevel)},
 						{title:'Resources',onselect:_bind(this, this.openResourcesManager)},
-						{title:'Pause',onselect:_bind(this, this.pause)},
+						{title:'Rendering',onselect:_bind(this, this.toggleRendering),id:"renderingButton"},
+						{title:'Animation',onselect:_bind(this, this.toggleAnimation),id:"animationButton"},
+						{title:'Physics',onselect:_bind(this, this.togglePhysics),id:"physicsButton"},
+						{title:'Look',onselect:_bind(this, this.toggleLook),id:"lookButton"},
 					],
 			css:{top:0,left:0},
 			element:this.menuContainer
 		}
 	);
-		
+	
+	this.updateButton = function(button, highlighted, color ) {
+		if (highlighted) {
+			button.css({backgroundColor:color});
+		} else {
+			button.css({backgroundColor:"inherit"});
+		}
+	}
+	
+	this.updateMenuButtonsHost = function() {
+		this.updateButton($("#renderingButton",this.menuContainer),!this.host3D.renderingPaused, "Orange");
+		this.updateButton($("#animationButton",this.menuContainer),!this.host3D.animationPaused, "Green");
+		this.updateButton($("#physicsButton",this.menuContainer),!this.host3D.physicsPaused, "Purple");
+	}
+	
+	this.updateMenuButtonsControls = function() {
+		this.updateButton($("#lookButton",this.menuContainer),this.controls.lookEnabled, "Blue");
+	}
+	
 	/* NODE TREE */
 	
 	this.levelNodeTree = this.ui.addContainer();
 	this.levelNodeTree.css({top:"70px",left:"0px",minWidth:"250px",maxWidth:"50%",width:"auto",display:"inline-block"/*,height:"100%"*/});
 	
 	/* INIT */
+	this.ui.showLoading();
 	this.loadResources();
 }

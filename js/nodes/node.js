@@ -32,23 +32,28 @@ weggeNode.prototype.getChildrenJSON = function() {
 	return children;
 }
 
+weggeNode.prototype.createNode = function(json) {	
+	var node;
+	if (json.type) {
+		if (window["wegge" + json.type]) {
+			node = new window["wegge" + json.type]();
+			node.loadFromJSON(json);
+		} else {
+			console.log("Type not available: " + json.type);
+		}
+	} else {
+		console.log("Type must be specified.");
+	}
+	return node;
+}		
+
 /* call this.loadChildrenFromJSON(json) to create children */
 weggeNode.prototype.loadChildrenFromJSON = function(json) {
 	this.children = [];
 	if (json.children) {		
 		var child, child_json;
 		for ( var i = 0, max = json.children.length; i < max; i++) {
-			child_json = json.children[i];
-			if (child_json.type) {
-				if (window["wegge" + child_json.type]) {
-					child = new window["wegge" + child_json.type]();
-					child.loadFromJSON(child_json);
-				} else {
-					console.log("Type not available: " + child_json.type);
-				}
-			} else {
-				console.log("Type must be specified.");
-			}
+			child = this.createNode(json.children[i]);			
 			this.children.push(child);
 		}
 	}
@@ -79,6 +84,11 @@ weggeNode.prototype.getJSON = function() {
 	return this.json;
 }
 
+weggeNode.prototype.clone = function () {
+	var clone = this.createNode( this.json );
+	return clone;
+}
+
 weggeNode.prototype.getChildrenRequiredResources = function() {
 	var required = [];
 	for ( var i = 0, max = this.children.length; i < max; i++) {
@@ -106,4 +116,19 @@ weggeNode.prototype.initialize = function ( resources ) {
 	this.initializeChildren(resources);
 	this.applyJSON();
 	this.initialized = true;
+}
+
+weggeNode.prototype.findNodeByName = function ( name ) {
+	if (this.json.name == name) {
+		return this;
+	} else {
+		if (this.children && this.children.length > 0) {
+			var node;
+			for ( var i = 0, max = this.children.length; i < max; i++) {
+				node = this.children[i].findNodeByName(name);
+				if (node) return node;
+			}			
+		}
+		return false;
+	}
 }

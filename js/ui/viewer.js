@@ -1,6 +1,6 @@
 var WEGGE_CREATOR_MODE = false;
 
-function weggeViewer() {
+function weggeViewer( ) {
 	
 	this.level = false;
 	this.resources = false;
@@ -12,16 +12,26 @@ function weggeViewer() {
 	
 	this.toggleRendering = function() {
 		if (this.host3D) {
-			if (this.host3D.animationPaused) {	
-				this.host3D.startAnimation();
-			} else {
-				this.host3D.stopAnimation();
-			}
+			this.host3D.toggleRendering();
+		}
+	}
+	
+	this.toggleAnimation = function() {
+		if (this.host3D) {
+			this.host3D.toggleAnimation();
+		}
+	}
+	
+	this.togglePhysics = function() {
+		if (this.host3D) {
+			this.host3D.togglePhysics();
 		}
 	}
 	
 	this.toggleLook = function() {
-		this.controls.lookEnabled = !this.controls.lookEnabled;
+		if (this.controls) {
+			this.controls.toggleLook();
+		}
 	}
 	
 	this.showInfo = function( text ) {
@@ -57,8 +67,7 @@ function weggeViewer() {
 	}
 		
 	this.levelLoaded = function( data ) { 
-		console.log("level loaded:");
-		console.log(data);
+		this.ui.showLoading("Initializing...");
 		if (data.level_id) {
 			this.level = new weggeLevel();
 			this.level.loadFromJSON(data.level_id, data.level_json);
@@ -74,6 +83,7 @@ function weggeViewer() {
 	}
 	
 	this.startLoadingLevel = function( level_id ) {
+		this.ui.showLoading("Loading...");
 		this.resetHost3D();
 		this.resources = false;
 		$.get("php/loadLevel.php",
@@ -148,17 +158,36 @@ function weggeViewer() {
 				this.controls = new weggeControls({ "camera":this.host3D.camera, element: document });
 				this.controls.resetToDefault();
 				this.controls.movementSpeed = 500;
-				this.controls.lookEnabled = this.controls.movementEnabled = true;
+				this.controls.movementEnabled = true;
+				this.controls.lookEnabled = _coalesce(this.level.json.lookEnabled,true);
 			}
 			
 			this.controls.initialize( this.host3D.camera, this.level.json.cameraLatitude, this.level.json.cameraLongitude );			
-			this.host3D.startAnimation();
+			
+			if (!this.level.json.renderingPaused) {
+				this.host3D.startRendering();
+			}
+			
+			if (!this.level.json.animationPaused) {
+				this.host3D.startAnimation();
+			}
+			
+			if (!this.level.json.physicsPaused) {
+				this.host3D.startPhysics();
+			}
+			
+			this.ui.hideLoading();
+			
+			if (this.onLevelLoaded) {
+				this.onLevelLoaded();
+			}
 		}
 	}
 
 	/* RESOURCES */
 	
 	this.resourcesLoaded = function( resources_json ) { 
+		this.ui.showLoading("Initializing resources...");
 		this.resources = new weggeResources();
 		this.resources.loadFromJSON( resources_json );
 		this.resources.onInitialized = _bind(this, this.start);
@@ -166,6 +195,10 @@ function weggeViewer() {
 	}		
 	
 	this.loadResources = function(ids) {
+		if (this.resources) {
+			this.resources.initialized = false;
+		}
+		this.ui.showLoading("Loading resources...");
 		$.get("php/loadResources.php", 
 			{ids:_coalesce(ids,'')},
 			_bind(this, this.resourcesLoaded)

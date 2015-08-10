@@ -12,22 +12,31 @@ function weggeObject() {
 	this.json.position = [0,0,0];
 	this.json.rotation = [0,0,0];
 	this.json.scale = [1,1,1];
+	this.json.physics = 0;
+	this.json.mass = 1;
+	this.json.selectable = 0;
 }
 
-weggeObject.prototype.applyJSON = function( also_children ) {
+weggeObject.prototype.applyJSON = function() {
 	this.applyBasic();
 }
 
 weggeObject.prototype.basicPropsEdited = function() {
-	this.json.position = _getArr(this.wrapper.position);
-	this.json.rotation = _getArr(this.wrapper.rotation);
-	this.json.scale = _getArr(this.wrapper.scale);
+	this.json.position = _vectorToArray(this.wrapper.position);
+	this.json.rotation = _vectorToArray(this.wrapper.rotation);
+	this.json.scale = _vectorToArray(this.wrapper.scale);
 }
 
 weggeObject.prototype.applyBasic = function() {
-	_applyArr(this.wrapper.position, this.json.position);
-	_applyArr(this.wrapper.rotation, this.json.rotation);
-	_applyArr(this.wrapper.scale, this.json.scale);	
+	if (this.wrapper && this.wrapper.position) {		
+		_applyArrayToVector(this.wrapper.position, this.json.position);
+	}
+	if (this.wrapper && this.wrapper.rotation) {		
+		_applyArrayToVector(this.wrapper.rotation, this.json.rotation);
+	}
+	if (this.wrapper && this.wrapper.scale) {		
+		_applyArrayToVector(this.wrapper.scale, this.json.scale);			
+	}	
 }
 
 /* call this.initializeChildren(resources) to initialize all children from resources */
@@ -49,24 +58,13 @@ weggeObject.prototype.addChildWrapper = function ( wrapper ) {
 }
 
 weggeObject.prototype.initialize = function ( resources ) {
-	this.initializeChildren(resources);
-	this.applyJSON();
+	if (resources) {
+		this.resources = resources;
+	}
+	this.initializeChildren(this.resources);	
 	this.initialized = true;
+	this.applyJSON();
 	return this.wrapper;
-}
-
-function _applyArr( v, arr ) {
-	v.set( arr[0], arr[1], arr[2] );
-}
-
-function _getArr( v ) {
-	return [v.x,v.y,v.z];
-}
-
-function _getColorHex( style ) {
-	var c = new THREE.Color();
-	c.setStyle(style);
-	return c.getHex();
 }
 
 weggeNode.prototype.availableTypes.push("Object");

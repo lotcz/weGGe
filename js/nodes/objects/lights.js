@@ -11,8 +11,10 @@ function weggeAmbientLight() {
 }
 
 weggeAmbientLight.prototype.applyJSON = function() {
-	this.wrapper.color.setStyle(this.json.color);
-	//this.applyBasic();
+	this.applyBasic();
+	if (this.wrapper.color) {
+		this.wrapper.color.setStyle(this.json.color);	
+	}
 }
 
 weggeAmbientLight.prototype.initialize = function() {

@@ -1,10 +1,26 @@
 function weggeUI( element ) {
 	this.element = $("<div id=\"ui\"></div>").appendTo(_coalesce(element, document.body));
-	
+			
 	this.addContainer = function( element ) {
 		return $("<div class=\"container\"></div>").appendTo(_coalesce(element, this.element));	
 	}
 	
+	this.addOverlay = function (element) {
+		if (!this.overlay) {
+			this.overlay = $("<div class=\"overlay\"></div>").appendTo(_coalesce(element,this.element));
+			this.loadingDialog = this.addContainer(this.overlay);
+			var topMargin = (window.innerHeight/3);
+			this.loadingDialog.css({width:"250px",marginTop:topMargin+"px",marginLeft:"auto",marginRight:"auto",border:"solid 1px White",padding:"5px",textAlign:"center"});
+			this.loadingDialog.hide();
+		}
+		return this.overlay;
+	}
+
+	this.removeOverlay = function() {
+		this.overlay = false;		
+		$(".overlay").remove();
+	}
+		
 	this.addFormItems = function( parent, data, props) {
 		var form = $("<ul class=\"form\"></ul>").appendTo(parent);
 		for (var property in data) {
@@ -36,6 +52,9 @@ function weggeUI( element ) {
 		var item;
 		for (var i = 0, max = params.links.length; i < max; i++) {
 			item = $("<li></li>").appendTo(menu);
+			if (params.links[i].id) {
+				$(item).attr("id", params.links[i].id);
+			}
 			item.append(params.links[i].title);
 			if (params.links[i].onselect) {
 				item.on( "click", params.links[i].onselect );
@@ -52,34 +71,27 @@ function weggeUI( element ) {
 		}
 		return cleaner;
 	}
-	
-	this.addOverlay = function (element) {
-		this.overlay = $("<div class=\"overlay\"></div>").appendTo(_coalesce(element,this.element));
-		return this.overlay;
+		
+	this.addNodeProperties = function(element, node, props) {
+		if (_isObject(node)) {
+			for (var property in node) {	
+				if ((!props)||($.inArray(property, props)>=0)) {
+					this.addNodeProperties(element, node[property], props);
+				}
+			}			
+		} else {
+			$("<td></td>").append(node).appendTo(element);				
+		}
 	}
-
-	this.removeOverlay = function() {
-		$(".overlay").remove();
-	}
 	
-	this.addNode = function( node, onselect, element, title ) {
+	this.addNode = function( node, onselect, element, props ) {
 		var row;
 		row = $("<tr></tr>").appendTo(element);
 		var fnc = function () {
 			onselect(node);
 		}
 		row.click(fnc);				
-		if (_isObject(node)) {
-			if (title) {
-				$("<td></td>").append(title).appendTo(row);
-			} else {
-				for (var property in node) {					
-					$("<td></td>").append(node[property]).appendTo(row);
-				}
-			}
-		} else {
-			$("<td></td>").append(node).appendTo(row);				
-		}
+		this.addNodeProperties(row, node, props);
 	}
 	
 	this.addNodeList = function( nodes, onselect, element ) {
@@ -89,6 +101,21 @@ function weggeUI( element ) {
 			this.addNode( nodes[i], onselect, list );
 		}			
 		return list;
+	}
+		
+	this.showLoading = function(text) {		
+		this.addOverlay();
+		this.loadingDialog.show();		
+		this.updateLoading(_coalesce(text,"Loading..."));
+	}
+	
+	this.updateLoading = function(message) {
+		this.loadingDialog.text(message);
+	}
+	
+	this.hideLoading = function() {
+		this.loadingDialog.hide();
+		this.removeOverlay();		
 	}
 	
 	/*

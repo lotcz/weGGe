@@ -7,6 +7,7 @@ function weggeModel() {
 	this.json.type = "Model";
 	this.json.name = "--model--";
 	this.json.path = "";
+	this.json.morphTargets = false;
 }
 
 weggeModel.prototype.initialize = function ( onInitialized ) {	
@@ -16,7 +17,7 @@ weggeModel.prototype.initialize = function ( onInitialized ) {
 			function ( geometry, materials ) {	
 				for (var m = 0, maxm = materials.length; m < maxm; m++) {
 					materials[m].side = THREE.DoubleSide;
-					materials[m].morphTargets = true;
+					materials[m].morphTargets = _this.json.morphTargets;
 					//materials[m].morphNormals = true;
 				}
 				_this.material = new THREE.MeshFaceMaterial( materials );

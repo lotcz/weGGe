@@ -1,0 +1,159 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link href="ui.css" rel="stylesheet"/>
+		<title>weGGe Pong</title>
+	</head>
+	
+	<body>	
+	</body>
+
+	<script src="lib/three.min.js" language="javascript"></script>	
+	<script src="lib/stats.min.js" language="javascript"></script>
+	<script src="lib/jquery.min.js" language="javascript"></script>
+	<script src="lib/three.min.js" language="javascript"></script>	
+	<script src="lib/helvetiker_regular.typeface.js" language="javascript"></script>
+	
+	<script src="lib/physi.js" language="javascript"></script>	
+	<script>
+		'use strict';
+
+		Physijs.scripts.worker = 'lib/physijs_worker.js';
+		Physijs.scripts.ammo = 'ammo.js';
+	</script>
+	
+	<script src="js/tools.js" language="javascript"></script>
+	<script src="js/host3d.js" language="javascript"></script>
+	<script src="js/controls.js" language="javascript"></script>
+	<script src="js/textSprites.js" language="javascript"></script>
+	
+	<script src="js/nodes/node.js" language="javascript"></script>
+	<script src="js/nodes/objects/object.js" language="javascript"></script>
+	<script src="js/nodes/level.js" language="javascript"></script>
+	<script src="js/nodes/objects/axis.js" language="javascript"></script>	
+	<script src="js/nodes/objects/basic.js" language="javascript"></script>
+	<script src="js/nodes/objects/lights.js" language="javascript"></script>
+	<script src="js/nodes/objects/plane.js" language="javascript"></script>
+	<script src="js/nodes/objects/mesh.js" language="javascript"></script>
+	<script src="js/nodes/objects/skybox.js" language="javascript"></script>
+	<script src="js/nodes/resources/resources.js" language="javascript"></script>
+	<script src="js/nodes/resources/resource.js" language="javascript"></script>
+	<script src="js/nodes/resources/model.js" language="javascript"></script>
+	<script src="js/nodes/resources/texture.js" language="javascript"></script>
+
+	<script src="js/ui/ui.js" language="javascript"></script>
+	<script src="js/ui/viewer.js" language="javascript"></script>
+	
+	<script>
+	
+		var viewer;
+	
+		function initEventHandling() {
+			var handleMouseDown, handleMouseMove, handleMouseUp, selected_mesh = false,
+				_v3 = new THREE.Vector3(), _vector = new THREE.Vector3(),
+				camera = viewer.host3D.camera, intersections;
+						
+			var cannon = viewer.level.findNodeByName("cannon");
+			var l = viewer.level.findNodeByName("l");
+			var r = viewer.level.findNodeByName("r");
+			
+			handleMouseDown = function( evt ) {
+				_vector.set(
+					( evt.clientX / window.innerWidth ) * 2 - 1,
+					-( evt.clientY / window.innerHeight ) * 2 + 1,
+					1
+				);
+				
+				var raycaster = new THREE.Raycaster();
+				raycaster.setFromCamera( _vector, camera );
+				intersections = raycaster.intersectObjects( viewer.level.selectable );
+				
+				if ( intersections.length > 0 ) {
+					selected_mesh = intersections[0].object;					
+					
+					if (selected_mesh === cannon.wrapper) {
+						console.log("Pong!");
+						var ball = new weggeSphere();						
+						ball.json.color = _randomColorHex();
+						ball.json.scale = [1,1,1];
+						ball.json.radius = 50;
+						ball.json.mass = 2;
+						var wrapper = ball.initialize();
+						wrapper.position.copy(selected_mesh.position);						
+						wrapper.rotation.copy(selected_mesh.rotation);
+						wrapper.__dirtyPosition = true;
+						viewer.host3D.scene.add(wrapper);
+						
+						_vector.copy( selected_mesh.rotation ).multiplyScalar(2000);
+						
+						wrapper.applyCentralImpulse(_vector);						
+					} else if (selected_mesh === l.wrapper) {
+						cannon.wrapper.rotateY(0.2);
+					} else if (selected_mesh === r.wrapper) {
+						cannon.wrapper.rotateY(-0.2);
+					}
+					
+					/*
+					_vector.set( 0, 0, 0 );
+					selected_block.setAngularFactor( _vector );
+					selected_block.setAngularVelocity( _vector );
+					selected_block.setLinearFactor( _vector );
+					selected_block.setLinearVelocity( _vector );
+
+					mouse_position.copy( intersections[0].point );
+					block_offset.subVectors( selected_block.position, mouse_position );
+					
+					intersect_plane.position.z = mouse_position.z;
+					*/
+				}
+			};
+			
+			handleMouseMove = function( evt ) {
+				if ( selected_mesh ) {
+					
+					_vector.set(
+						( evt.clientX / window.innerWidth ) * 2 - 1,
+						-( evt.clientY / window.innerHeight ) * 2 + 1,
+						1
+					);
+					
+				}
+				
+			};
+			
+			handleMouseUp = function( evt ) {
+				
+				if ( selected_mesh) {
+					
+				}
+				
+			};
+						
+			document.addEventListener( 'mousedown', handleMouseDown );
+			document.addEventListener( 'mousemove', handleMouseMove );
+			document.addEventListener( 'mouseup', handleMouseUp );
+			
+			viewer.host3D.scene.addEventListener(
+				'update',
+				function() {
+
+					if ( selected_mesh ) {
+						
+					}	
+					
+				}
+			);
+		}
+		
+		$(function () {
+			viewer = new weggeViewer();
+			viewer.onLevelLoaded = initEventHandling;
+			viewer.startLoadingLevel(24);
+			
+		});
+		
+	</script>
+		
+</html>
+

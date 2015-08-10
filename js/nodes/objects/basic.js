@@ -11,13 +11,34 @@ function weggeSphere() {
 	this.json.widthSegments = 10;
 	this.json.heightSegment = 10;
 	this.json.color = "#FF5050";
+	this.json.physics = 1;
+	
 }
 
 weggeSphere.prototype.initialize = function() {
 	var geometry = new THREE.SphereGeometry(this.json.radius, this.json.widthSegments, this.json.heightSegments);
 	var color = new THREE.Color();
 	color.setStyle(this.json.color);
-	this.wrapper = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({color:color,ambient:color}) );
+	var material = new THREE.MeshPhongMaterial({color:color,ambient:color});
+	
+	if (this.json.physics > 0) {
+		var phy_material = Physijs.createMaterial(
+			material,
+			.8, // medium friction
+			4 // bouncy
+		);		
+		this.wrapper = new Physijs.SphereMesh(
+			geometry,
+			phy_material,
+			this.json.mass
+		);
+		this.wrapper.addEventListener( 'collision', function( other_object, relative_velocity, relative_rotation, contact_normal ) {
+			// `this` has collided with `other_object` with an impact speed of `relative_velocity` and a rotational force of `relative_rotation` and at normal `contact_normal`
+			console.log(other_object);
+		});
+	} else {		
+		this.wrapper = new THREE.Mesh( geometry, material );
+	}
 	this.applyBasic();
 	return this.wrapper;
 }
@@ -36,16 +57,52 @@ function weggeBox() {
 	this.json.width = 100;
 	this.json.height = 100;
 	this.json.depth = 100;
+	this.json.material_id = 0;
 	this.json.color = "#FF5050";
 }
 
-weggeBox.prototype.initialize = function() {
+weggeBox.prototype.initialize = function(resources) {
 	var geometry = new THREE.BoxGeometry( this.json.width, this.json.height, this.json.depth );
-	var color = new THREE.Color();
-	color.setStyle(this.json.color);
-	this.wrapper = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({color:color,ambient:color}) );
+	var material = false;
+	
+	if (resources) {
+		var res = resources.getById( this.json.material_id );
+		if (res) {
+			material = res.material;
+		} 
+	}
+	
+	if (!material) {
+		var color = new THREE.Color();
+		color.setStyle(this.json.color);
+		material = new THREE.MeshLambertMaterial({color:color,ambient:color});
+	}
+	
+	if (this.json.physics > 0) {
+		var phy_material = Physijs.createMaterial(
+			material,
+			.6, // medium friction
+			.3 // low restitution
+		);		
+		this.wrapper = new Physijs.BoxMesh(
+			geometry,
+			phy_material,
+			this.json.mass
+		);	
+	} else {		
+		this.wrapper = new THREE.Mesh( geometry, material );
+	}
+	
 	this.applyBasic();
 	return this.wrapper;
+}
+
+weggeBox.prototype.getRequiredResources = function() {
+	var required = [];
+	if (this.json.material_id > 0) {
+		required.push(this.json.material_id);
+	}
+	return required;
 }
 
 weggeNode.prototype.availableTypes.push("Box");

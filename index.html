@@ -3,12 +3,13 @@
 	<head>
 		<meta charset="utf-8" />
 		<link href="ui.css" rel="stylesheet"/>
+		<link href="favicon.ico" rel="icon"/>
 		<title>weGGe</title>
 	</head>
 	
 	<body></body>
 
-	<script src="lib/three.js" language="javascript"></script>	
+	<script src="lib/three.min.js" language="javascript"></script>	
 	<script src='lib/threex.volumetricspotlightmaterial.js'></script>
 	<script src='lib/threex.volumetricspotlightmesh.js'></script>
 	<script src='lib/threex.spaceships.js'></script>
@@ -16,6 +17,14 @@
 	<script src='lib/MTLLoader.js'></script>
 	<script src='lib/OBJMTLLoader.js'></script>
 
+	<script src="lib/physi.js" language="javascript"></script>	
+	<script>
+		'use strict';
+
+		Physijs.scripts.worker = 'lib/physijs_worker.js';
+		Physijs.scripts.ammo = 'ammo.js';
+	</script>
+	
 	<script src="lib/stats.min.js" language="javascript"></script>
 	<script src="lib/jquery.min.js" language="javascript"></script>
 	<script src="lib/helvetiker_regular.typeface.js" language="javascript"></script>
@@ -36,6 +45,7 @@
 	<script src="js/nodes/objects/spaceship.js" language="javascript"></script>
 	<script src="js/nodes/objects/grass.js" language="javascript"></script>
 	<script src="js/nodes/objects/mesh.js" language="javascript"></script>
+	<script src="js/nodes/objects/skybox.js" language="javascript"></script>
 	
 	<script src="js/nodes/resources/resources.js" language="javascript"></script>
 	<script src="js/nodes/resources/resource.js" language="javascript"></script>

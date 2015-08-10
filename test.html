@@ -15,6 +15,14 @@
 	<script src="lib/three.min.js" language="javascript"></script>	
 	<script src="lib/helvetiker_regular.typeface.js" language="javascript"></script>
 	
+	<script src="lib/physi.js" language="javascript"></script>	
+	<script>
+		'use strict';
+
+		Physijs.scripts.worker = 'lib/physijs_worker.js';
+		Physijs.scripts.ammo = 'ammo.js';
+	</script>
+	
 	<script src="js/tools.js" language="javascript"></script>
 	<script src="js/host3d.js" language="javascript"></script>
 	<script src="js/controls.js" language="javascript"></script>
@@ -26,8 +34,11 @@
 	<script src="js/nodes/objects/axis.js" language="javascript"></script>	
 	<script src="js/nodes/objects/basic.js" language="javascript"></script>
 	<script src="js/nodes/objects/lights.js" language="javascript"></script>
+	<script src="js/nodes/objects/plane.js" language="javascript"></script>
+	<script src="js/nodes/objects/mesh.js" language="javascript"></script>
 	<script src="js/nodes/resources/resources.js" language="javascript"></script>
 	<script src="js/nodes/resources/resource.js" language="javascript"></script>
+	<script src="js/nodes/resources/model.js" language="javascript"></script>
 	<script src="js/nodes/resources/texture.js" language="javascript"></script>
 
 	<script src="js/ui/ui.js" language="javascript"></script>

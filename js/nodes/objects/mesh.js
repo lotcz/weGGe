@@ -20,7 +20,9 @@ weggeMesh.prototype.applyJSON = function(resources) {
 		var res = resources.getById( this.json.model_id );	
 		if (res) {
 			this.wrapper = new THREE.Mesh( res.geometry, res.material );	
-		}	
+		} else {
+			console.log("Model not found:" + this.json.model_id);
+		}
 	}
 	this.applyBasic();
 }
@@ -66,7 +68,9 @@ weggeAnimatedMesh.prototype.applyJSON = function(resources) {
 }
 
 weggeAnimatedMesh.prototype.animationFrame = function (delta) {
-	this.wrapper.updateAnimation(delta);
+	if (this.wrapper && this.wrapper.updateAnimation) {
+		this.wrapper.updateAnimation(delta);
+	}
 }
 
 weggeNode.prototype.availableTypes.push("AnimatedMesh");

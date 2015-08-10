@@ -126,3 +126,35 @@ function _getTypeName (obj) {
 		return obj;
 	}
 };
+
+function _applyArrayToVector( v, arr ) {
+	v.set( arr[0], arr[1], arr[2] );
+}
+
+function _arrayToVector( arr ) {
+	v = new THREE.Vector3();
+	v.set( parseFloat(arr[0]), parseFloat(arr[1]), parseFloat(arr[2]) );
+	return v;
+}
+
+function _vectorToArray( v ) {
+	return [v.x,v.y,v.z];
+}
+
+function _getColorHex( style ) {
+	var c = new THREE.Color();
+	c.setStyle(style);
+	return c.getHex();
+}
+
+function _boolToInt(b) {
+	return (b) ? 1 : 0; 
+}
+
+function _randomColor() {
+	return new THREE.Color(Math.random(),Math.random(),Math.random());	
+}
+
+function _randomColorHex() {
+	return "#" + _randomColor().getHexString();
+}

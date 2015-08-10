@@ -5,19 +5,41 @@ function weggePlane() {
 	this.base = weggeObject;
 	this.base();
 	
+	this.json.name = "--plane--";
 	this.json.type = "Plane";
-	this.json.position = {x:0,y:0,z:0};
-	this.json.rotation = {x:0,y:0,z:0};
-	this.json.scale = {x:0,y:0,z:0};
+	this.json.material_id = 0;
 }
 
 weggePlane.prototype.initialize = function ( resources ) {
+	var geometry, material;
+	
+	var geometry = new THREE.PlaneGeometry(10, 10, 10);
+	
 	var res = resources.getById( this.json.material_id );
-	var geometry = new THREE.PlaneGeometry(this.json.scale.x, this.json.scale.y, this.json.scale.z);
-	this.wrapper = new THREE.Mesh( geometry, res.material );
-	this.wrapper.position.set(this.json.position.x, this.json.position.y, this.json.position.z);
-	this.wrapper.rotation.set(this.json.rotation.x, this.json.rotation.y, this.json.rotation.z);
+	if (res) {
+		material = res.material;
+	} else {
+		material = new THREE.MeshLambertMaterial();
+	}
+	
+	if (this.json.physics) {
+		var phy_material = Physijs.createMaterial(
+			material,
+			.6, // medium friction
+			.3 // low restitution
+		);		
+		this.wrapper = new Physijs.PlaneMesh(
+			geometry,
+			phy_material,
+			this.json.mass
+		);	
+	} else {		
+		this.wrapper = new THREE.Mesh( geometry, material );
+	}
+		
+	this.applyBasic();
 	return this.wrapper;
+	
 }
 
 weggePlane.prototype.getRequiredResources = function() {
@@ -25,3 +47,5 @@ weggePlane.prototype.getRequiredResources = function() {
 	required.push(this.json.material_id);
 	return required;
 }
+
+weggeNode.prototype.availableTypes.push("Plane");
