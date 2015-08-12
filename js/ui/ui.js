@@ -44,7 +44,7 @@ function weggeUI( element ) {
 				}
 				form.append(item);
 			}
-		}
+		}		
 	}
 
 	this.addMenu = function ( params ) {

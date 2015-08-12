@@ -1,8 +1,8 @@
-weggeLevel.prototype = new weggeObject();
+weggeLevel.prototype = new weggeNode();
 weggeLevel.prototype.constructor = weggeLevel; 
 
 function weggeLevel() {
-	this.base = weggeObject;
+	this.base = weggeNode;
 	this.base();	
 	this.id = 0;
 	this.json.type = "Level";
@@ -34,7 +34,6 @@ function weggeLevel() {
 }
 
 weggeLevel.prototype.applyJSON = function() {
-	//this.applyBasic();
 	if (this.host3D) {
 		this.host3D.renderer.setClearColor( _coalesce(this.json.clearColor, 0x101010) );
 		_applyArrayToVector(this.host3D.camera.position, this.json.cameraPosition);
@@ -132,11 +131,17 @@ weggeLevel.prototype.initialize = function ( host3D, resources ) {
 	} else {
 		this.host3D.initScene(this.json);
 	}
-	this.wrapper = this.host3D.scene;
-	this.initializeChildren(resources);
+	
+	var wrappers = [];	
+	for (var i = 0, max = this.children.length; i < max; i++ ) {
+		_append(wrappers, this.children[i].initialize(resources));
+	}
+	for (var i = 0, max = wrappers.length; i < max; i++ ) {
+		this.host3D.scene.add(wrappers[i]);
+	}
+	
 	this.applyJSON();
 	this.buildAnimatedArray();
 	this.buildSelectableArray();
 	this.initialized = true;
-	//this.host3D.scene.add(this.wrapper);
 }

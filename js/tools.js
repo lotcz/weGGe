@@ -34,6 +34,8 @@ function _remove( arr, el ) {
 	Copy elements from second array into the first.
 */
 function _append( arr1, arr2 ) {
+	if (!_isArray(arr1) && arr1 !== null) arr1 = [arr1];
+	if (!_isArray(arr2) && arr2 !== null) arr2 = [arr2];
 	for ( var i = 0, max = arr2.length; i < max; i++) {
 		arr1.push(arr2[i]);
 	} 
@@ -84,6 +86,10 @@ function _isObject( o ) {
 	return ((o !== null) && (typeof o === 'object'));
 }
 
+function _isArray( a ) {
+	return (Object.prototype.toString.call( a ) === '[object Array]' );
+}
+
 function _getJSON( url, onsuccess, onerror ) {
 	var xmlhttp = new XMLHttpRequest();
 
@@ -128,12 +134,12 @@ function _getTypeName (obj) {
 };
 
 function _applyArrayToVector( v, arr ) {
-	v.set( arr[0], arr[1], arr[2] );
+	v.set( parseFloat(arr[0]), parseFloat(arr[1]), parseFloat(arr[2]) );
 }
 
 function _arrayToVector( arr ) {
 	v = new THREE.Vector3();
-	v.set( parseFloat(arr[0]), parseFloat(arr[1]), parseFloat(arr[2]) );
+	_applyArrayToVector( v, arr );
 	return v;
 }
 

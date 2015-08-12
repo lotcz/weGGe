@@ -247,12 +247,12 @@ function weggeCreator() {
 	
 	this.nodeTypeSelected = function ( ntype ) {
 		var node = new window["wegge" + ntype]();
-		this.nodeBeingEdited.children.push( node );
-		$("ul:first", this.nodeBeingEdited.treeContainer).append(this.addTreeNode(node));
+		this.nodeBeingEdited.addChild( node );		
 		if (this.nodeBeingEdited.addChildWrapper) {
 			this.nodeBeingEdited.addChildWrapper(node.initialize(this.resources));
 		}
 		this.nodeTypeCancel();
+		this.fillLevelTree();
 		this.editNode(node);		
 	}
 	
@@ -296,7 +296,7 @@ function weggeCreator() {
 	
 	this.nodeSave = function() {
 		this.nodeBeingEdited.applyJSON();
-		this.showTransformControls(this.nodeBeingEdited);
+		this.showTransformControls(false);
 		this.nodeCancel();
 	}
 		
@@ -306,6 +306,7 @@ function weggeCreator() {
 		this.nodeTypeCancel();		
 		$(".selected", this.levelNodeTree).removeClass("selected");
 		$("a:first",this.nodeBeingEdited.treeContainer).addClass("selected");
+		$("ul",this.nodeBeingEdited.treeContainer).addClass("selected");
 		this.nodeForm = this.ui.addContainer();
 		this.nodeForm.css({top:"70px",display:"inline-block",width:"450px",position:"absolute",paddingRight:"15px",paddingBottom:"10px",maxHeight:"85%",overflow:"auto"});
 		this.ui.addFormItems( this.nodeForm, node.json );
@@ -326,12 +327,13 @@ function weggeCreator() {
 	}
 	
 	this.cloneNode = function() {	
-		if (this.nodeBeingEdited && (this.nodeBeingEdited !== this.level)) {
+		if (this.nodeBeingEdited && this.nodeBeingEdited.parent) {
 			this.nodeSave();
 			var clone = this.nodeBeingEdited.clone();
-			this.host3D.scene.add(clone.initialize(this.resources));
-			this.levelTreeNode.append(this.addTreeNode(clone));
-			this.level.children.push( clone );			
+			this.host3D.scene.add(clone.initialize(this.resources));			
+			this.nodeBeingEdited.parent.addChild( clone );
+			this.fillLevelTree();
+			this.editNode(clone);
 		}
 	}
 	
@@ -356,8 +358,14 @@ function weggeCreator() {
 		}
 
 		node.treeContainer = el;
-		var sub = $("<ul class=\"node-tree\"></ul>").appendTo(el);
-		if (node.children && node.children.length > 0) {			
+				
+		if (node.children && node.children.length > 0) {		
+			var sub = $("<ul class=\"node-tree\"></ul>").appendTo(el);
+			var expand = function() {
+				this.slideToggle(); // this is binded to sub :-)
+			}
+			var expander = $("<a> [+-]</a>").appendTo(el).click( _bind(sub,expand) );
+						
 			for (var i = 0, max = node.children.length; i < max ; i++) {
 				sub.append( this.addTreeNode(node.children[i]) );
 			}			
@@ -365,9 +373,16 @@ function weggeCreator() {
 		return el;
 	}
 	
+	this.moveNodeUp = function(node) {
+		
+	}
+	
 	this.levelTreeNode = false;
 	
-	this.fillLevelTree = function () {		
+	this.fillLevelTree = function () {	
+		if (this.levelTreeNode) {
+			this.levelNodeTree.empty();
+		}
 		if (this.level) {
 			var el = $("<ul class=\"node-tree\"></ul>").appendTo(this.levelNodeTree);
 			this.levelTreeNode = this.addTreeNode(this.level);
@@ -377,7 +392,11 @@ function weggeCreator() {
 					links: [
 						{title:'ADD',onselect:_bind(this, this.newNode)},
 						{title:'REMOVE',onselect:_bind(this, this.removeNode)},
-						{title:'CLONE',onselect:_bind(this, this.cloneNode)}
+						{title:'CLONE',onselect:_bind(this, this.cloneNode)},
+						{title:' ↑ ',onselect:_bind(this, this.moveNodeUp)},
+						{title:' ↓ ',onselect:_bind(this, this.moveNodeDown)},
+						{title:'◄',onselect:_bind(this, this.moveNodeLeft)},
+						{title:'►',onselect:_bind(this, this.moveNodeRight)},						
 					],
 					css:{fontSize:"4mm", marginTop:"10px", marginBottom:"10px"},
 					element:this.levelNodeTree
@@ -407,8 +426,8 @@ function weggeCreator() {
 	}
 	
 	this.showTransformControls = function( node ) {
-		if (node.wrapper && this.host3D && this.host3D.initialized) {
-			this.hideTransformControls();
+		this.hideTransformControls();
+		if (node && node.wrapper && this.host3D && this.host3D.initialized) {			
 			this.transformControls = new THREE.TransformControls( this.host3D.camera, this.ui.element[0] /*this.host3D.renderer.domElement*/ );
 			this.transformControls.addEventListener( 'change', this.onTransformControlsChangeCallback);
 			this.transformControls.attach( node.wrapper );

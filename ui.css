@@ -99,6 +99,11 @@ body {
 #ui ul.node-tree a.selected {	
 	font-weight:bold;
 	cursor:default;
+	color:#A0FFA0;
+}
+
+#ui ul.node-tree ul.selected {	
+	color:#90E090;
 }
 
 #ui ul.form {

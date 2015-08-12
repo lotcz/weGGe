@@ -1,6 +1,7 @@
 weggeNode.prototype.availableTypes = [];
 
 function weggeNode() {
+	this.parent = false;
 	this.json = {};
 	this.json.name = "--node--";
 	this.json.type = "Node";
@@ -47,6 +48,11 @@ weggeNode.prototype.createNode = function(json) {
 	return node;
 }		
 
+weggeNode.prototype.addChild = function(child) {
+	child.parent = this;
+	this.children.push(child);
+}
+
 /* call this.loadChildrenFromJSON(json) to create children */
 weggeNode.prototype.loadChildrenFromJSON = function(json) {
 	this.children = [];
@@ -54,7 +60,7 @@ weggeNode.prototype.loadChildrenFromJSON = function(json) {
 		var child, child_json;
 		for ( var i = 0, max = json.children.length; i < max; i++) {
 			child = this.createNode(json.children[i]);			
-			this.children.push(child);
+			this.addChild(child);			
 		}
 	}
 }
