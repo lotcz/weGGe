@@ -7,6 +7,9 @@ function weggeViewer( ) {
 	this.host3D = false;
 	this.controls = false;
 	
+	this.mouse = null;
+	this.mouseSelect = true;
+	
 	this.ui = new weggeUI();
 	this.info = this.ui.addContainer().css({position:"absolute",bottom:"0px",right:"0px"}).hide();
 	
@@ -69,6 +72,7 @@ function weggeViewer( ) {
 	this.levelLoaded = function( data ) { 
 		this.ui.showLoading("Initializing...");
 		if (data.level_id) {
+			_createCookie("level",data.level_id);
 			this.level = new weggeLevel();
 			this.level.loadFromJSON(data.level_id, data.level_json);
 			var res = this.level.getRequiredResources();
@@ -145,6 +149,7 @@ function weggeViewer( ) {
 	this.animationFrame = function(delta) {
 		this.controls.animationFrame(delta);
 		this.level.animationFrame(delta);
+		//if (this.mouseSelect && this.mouse !== null) {this.mouse.animationFrame(delta);}
 	}
 	
 	this.start = function() {
@@ -154,6 +159,7 @@ function weggeViewer( ) {
 			this.level.initialize(this.host3D, this.resources);
 			this.host3D.onAnimationFrame = _bind(this, this.animationFrame);
 		
+			/* init controls */
 			if (!this.controls) {
 				this.controls = new weggeControls({ "camera":this.host3D.camera, element: document });
 				this.controls.resetToDefault();
@@ -164,6 +170,16 @@ function weggeViewer( ) {
 			
 			this.controls.initialize( this.host3D.camera, this.level.json.cameraLatitude, this.level.json.cameraLongitude );			
 			
+			if (this.mouse !== null) {
+				this.mouse.destroy();
+				this.mouse = null;
+			}
+			
+			if (this.mouseSelect) {				
+				this.mouse = new weggeMouse(this.level.selectable, this.host3D.camera);
+			}
+			
+			/* start */
 			if (!this.level.json.renderingPaused) {
 				this.host3D.startRendering();
 			}

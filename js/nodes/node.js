@@ -48,9 +48,62 @@ weggeNode.prototype.createNode = function(json) {
 	return node;
 }		
 
-weggeNode.prototype.addChild = function(child) {
+weggeNode.prototype.addChild = function(child, index) {
 	child.parent = this;
-	this.children.push(child);
+	if (index !== null && index <= this.children.length) {
+		this.children.splice(index,0,child);
+	} else {
+		this.children.push(child);
+	}
+}
+
+weggeNode.prototype.moveNodeUp = function() {
+	if (this.parent && this.parent.children && this.parent.children.length > 1) {
+		var i = this.parent.children.indexOf(this);
+		if (i > 0) {
+			this.parent.children.splice(i,1);
+			this.parent.children.splice(i-1,0,this);
+			return true;
+		}
+	}
+	return false;
+}
+
+weggeNode.prototype.moveNodeDown = function() {
+	if (this.parent && this.parent.children && this.parent.children.length > 1) {
+		var i = this.parent.children.indexOf(this);
+		if (i < this.parent.children.length) {
+			this.parent.children.splice(i,1);
+			this.parent.children.splice(i+1,0,this);
+			return true;
+		}
+	}
+	return false;
+}
+
+weggeNode.prototype.moveNodeLeft = function() {
+	if (this.parent && this.parent.parent && this.parent.parent && this.parent.parent.addChild) {
+		this.parent.children.splice(this.parent.children.indexOf(this),1);
+		this.parent.parent.addChild(this, this.parent.parent.children.indexOf(this.parent));
+		return true;		
+	} else {
+		return false;
+	}
+}
+
+weggeNode.prototype.moveNodeRight = function() {
+	if (this.parent && this.parent.children && this.parent.children.length > 1) {
+		var myIndex = this.parent.children.indexOf(this);
+		if (myIndex < this.parent.children.length) {
+			var nextSibling = this.parent.children[myIndex+1];
+			if (nextSibling && nextSibling.addChild) {
+				this.parent.children.splice(this.parent.children.indexOf(this),1);
+				nextSibling.addChild(this, 0);
+				return true;
+			}
+		}		
+	} 
+	return false;	
 }
 
 /* call this.loadChildrenFromJSON(json) to create children */
@@ -91,7 +144,8 @@ weggeNode.prototype.getJSON = function() {
 }
 
 weggeNode.prototype.clone = function () {
-	var clone = this.createNode( this.json );
+	var json_string = JSON.stringify( this.json);
+	var clone = this.createNode(JSON.parse(json_string));
 	return clone;
 }
 
@@ -113,15 +167,17 @@ weggeNode.prototype.getRequiredResources = function() {
 }
 
 weggeNode.prototype.initializeChildren = function ( resources ) {
+	var child_wrappers = [];	
 	for ( var i = 0, max = this.children.length; i < max; i++) {
-		this.children[i].initialize(resources);		
+		_append(child_wrappers, this.children[i].initialize(resources));
 	}
+	return child_wrappers;
 }
 
 weggeNode.prototype.initialize = function ( resources ) {
-	this.initializeChildren(resources);
 	this.applyJSON();
 	this.initialized = true;
+	return this.initializeChildren(resources);
 }
 
 weggeNode.prototype.findNodeByName = function ( name ) {

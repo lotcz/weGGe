@@ -107,7 +107,7 @@ function weggeControls( params ) {
 		if (this.movementEnabled) {
 			switch( key ) {
 				case 38: /*up*/
-				case 87: /*W*/ this.moveForward = false; break;
+				case 87: /*W*/ this.moveForward = false; break;								
 				case 37: /*left*/
 				case 65: /*A*/ this.moveLeft = false; break;
 				case 40: /*down*/

@@ -34,7 +34,8 @@ weggeSphere.prototype.initialize = function() {
 		);
 		this.wrapper.addEventListener( 'collision', function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 			// `this` has collided with `other_object` with an impact speed of `relative_velocity` and a rotational force of `relative_rotation` and at normal `contact_normal`
-			console.log(other_object);
+			console.log("In weggeSphere.prototype.initialize.");
+			console.log(other_object);			
 		});
 	} else {		
 		this.wrapper = new THREE.Mesh( geometry, material );

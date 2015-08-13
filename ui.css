@@ -21,6 +21,15 @@ body {
 	float:left;
 }
 
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 .half {
 	width:50%;
 }
@@ -141,15 +150,15 @@ body {
 
 }
 
-#ui .list td{
+#ui .list td {
 	cursor:pointer;
-	padding:3px;
-	margin:1px;
-	background-color:#404040;
+	padding:10px;
+	margin:2px;
+	background-color:#202030;
 }
 
 #ui .list tr:hover, #ui .list td:hover {
-	text-decoration:underline;
+	background-color:#404060;
 }
 
 #ui .border {

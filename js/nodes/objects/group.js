@@ -10,11 +10,8 @@ function weggeGroup( params ) {
 }	
 	
 weggeGroup.prototype.initialize = function(resources) {
-	var child_wrappers = [];	
-	for ( var i = 0, max = this.children.length; i < max; i++) {
-		_append(child_wrappers, this.children[i].initialize(resources));
-	}
-	return child_wrappers;
+	this.initialized = true;
+	return this.initializeChildren(resources);
 }
 
 weggeNode.prototype.availableTypes.push("Group");

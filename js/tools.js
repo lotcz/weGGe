@@ -133,6 +133,10 @@ function _getTypeName (obj) {
 	}
 };
 
+function _v(x, y, z) {
+	return _arrayToVector([x,y,z]);
+}
+
 function _applyArrayToVector( v, arr ) {
 	v.set( parseFloat(arr[0]), parseFloat(arr[1]), parseFloat(arr[2]) );
 }
@@ -163,4 +167,34 @@ function _randomColor() {
 
 function _randomColorHex() {
 	return "#" + _randomColor().getHexString();
+}
+
+/* COOKIES */
+
+function _createCookie(name, value, days) {
+    var expires;
+
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toGMTString();
+    } else {
+        expires = "";
+    }
+    document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + "; path=/";
+}
+
+function _readCookie(name) {
+    var nameEQ = encodeURIComponent(name) + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+    }
+    return null;
+}
+
+function _eraseCookie(name) {
+    _createCookie(name, "", -1);
 }

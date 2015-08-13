@@ -124,6 +124,17 @@ weggeLevel.prototype.loadFromJSON = function(id, json) {
 	return this;
 }
 
+weggeLevel.prototype.initializeActors = function (node) {
+	if (node.initActor) {
+		node.initActor(this);
+	}
+	if (node.children) {
+		for ( var i = 0, max = node.children.length; i < max; i++) {
+			this.initializeActors(node.children[i]);
+		}
+	}
+}
+
 weggeLevel.prototype.initialize = function ( host3D, resources ) {
 	this.host3D = host3D;	
 	if (this.json.physics > 0) {
@@ -143,5 +154,6 @@ weggeLevel.prototype.initialize = function ( host3D, resources ) {
 	this.applyJSON();
 	this.buildAnimatedArray();
 	this.buildSelectableArray();
+	this.initializeActors(this);
 	this.initialized = true;
 }
