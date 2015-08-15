@@ -3,13 +3,16 @@ function weggeResourcesManager( params ) {
 	this.resources = params.resources;
 	this.container = false;
 	this.onResourceSelected = params.onResourceSelected;
+	this.onManagerExit = params.onManagerExit;
 	this.overlay = false;
 	
 	this.show = function (resources) {
 		this.resources = resources;
 		this.overlay = this.ui.addOverlay();
 		if (!this.container) {
-			this.container = this.ui.addContainer().css({left:"0px",right:"0px",top:"70px",bottom:"0px",opacity:1,position:"fixed",zIndex:"99999999999999"});
+			this.container = this.ui.addContainer()
+				.css({left:"0px",right:"0px",top:"70px",bottom:"0px",opacity:1,position:"fixed",zIndex:"99999999999999"})
+				.addClass("resources");
 			this.innerContainer = this.ui.addContainer(this.container).addClass("border");			
 			this.resourcesList = this.ui.addContainer(this.innerContainer).addClass("column half");
 			this.resourceForm = this.ui.addContainer(this.innerContainer).addClass("column half");
@@ -18,8 +21,8 @@ function weggeResourcesManager( params ) {
 					
 			this.ui.addMenu( {
 					links: [
-								{title:'New resource',onselect:_bind(this, this.newResource)},
-								{title:'Cancel',onselect:_bind(this, this.hide)},
+								{title:'NEW',onselect:_bind(this, this.newResource)},								
+								{title:'CANCEL',onselect:_bind(this, this.hide)},
 							],
 					css:{top:0,left:0},
 					element:this.innerContainer 
@@ -29,11 +32,11 @@ function weggeResourcesManager( params ) {
 			this.ui.addCleaner(this.innerContainer);
 		}
 		this.resourcesList.empty();
-		if (this.resources.children.length > 0) {
-			var list = $("<table class=\"list\"></table>").appendTo(this.resourcesList);		
+		this.resourcesInnerList = $("<table class=\"list\"></table>").appendTo(this.resourcesList);
+		if (this.resources.children.length > 0) {			
 			var fn = _bind(this, this.editResource);
 			for (var i = 0, max = this.resources.children.length; i < max; i++) {
-				this.ui.addNode( this.resources.children[i], fn, list, ["id","json","name","type","path"] );
+				this.ui.addNode( this.resources.children[i], fn, this.resourcesInnerList, ["json","name","type","path"] );
 			}
 		} else {
 			this.resourcesList.append("No resources available in weGGe database.");
@@ -44,7 +47,7 @@ function weggeResourcesManager( params ) {
 	this.resourceTypeSelected = function ( rtype ) {
 		var resource = new window["wegge" + rtype]();
 		this.resources.children.push( resource );
-		this.ui.addNode(resource.json, _bind(this, this.editResource), this.resourcesList);
+		this.ui.addNode(resource, _bind(this, this.editResource), this.resourcesInnerList, ["json","name","type","path"]);
 		this.editResource(resource);		
 	}
 	
@@ -52,18 +55,32 @@ function weggeResourcesManager( params ) {
 		this.resourceForm.empty();
 	}
 	
-	this.removeResource = function() {
-		if (this.resourceBeingEdited && (this.resourceBeingEdited !== this.level)) {
-			this.resourceBeingEdited.treeContainer.remove();
-			this.level.removeNode(this.resourceBeingEdited);
-			this.nodeCancel();
+	this.resourceFormCancel = function() {
+		this.resourceForm.empty();
+	}
+	
+	this.resourceDeleted = function(data) {
+		console.log("Resource deleted:" + data);
+	}
+	
+	this.deleteResource = function() {
+		if (this.resourceBeingEdited) {
+			if (confirm("Are you sure to delete this resource?")) {
+				if (this.resourceBeingEdited.element) {
+					this.resourceBeingEdited.element.remove();
+				}
+				$.post("php/deleteResource.php", { "resource_id":this.resourceBeingEdited.id }, 
+					_bind(this, this.resourceDeleted)
+				);
+				this.resourceFormCancel();
+			}
 		}
 	}
 	
 	this.newResource = function() {
 		this.resourceForm.empty();
 		weggeResource.prototype.availableTypes.sort();
-		this.ui.addNodeList( weggeResource.prototype.availableTypes, _bind(this, this.resourceTypeSelected), this.resourceForm );
+		this.ui.addList( weggeResource.prototype.availableTypes, _bind(this, this.resourceTypeSelected), this.resourceForm );
 		this.ui.addMenu( {
 				links: [
 							{title:'Cancel',onselect:_bind(this, this.resourceTypeCancel)},
@@ -78,12 +95,17 @@ function weggeResourcesManager( params ) {
 		this.resourceForm.empty();
 		this.resourceBeingEdited = resource;
 		$(".selected", this.resourcesList).removeClass("selected");
-		//$("a:first",this.resourceBeingEdited.listContainer).addClass("selected");
+		if (this.resourceBeingEdited && this.resourceBeingEdited.element) {
+			$(this.resourceBeingEdited.element).addClass("selected");
+		}
 		this.ui.addFormItems( this.resourceForm, resource.json );
 		this.ui.addCleaner( this.resourceForm );
 		this.ui.addMenu( {
 				links: [
-							{title:'Save',onselect: _bind(this, this.saveResource)},
+							{title:'SAVE',onselect: _bind(this, this.saveResource)},
+							{title:'CLONE',onselect: _bind(this, this.cloneResource)},
+							{title:'DELETE',onselect: _bind(this, this.deleteResource)},
+							{title:'CANCEL',onselect: _bind(this, this.resourceFormCancel)},
 						],
 				css:{top:0,left:0},
 				element:this.resourceForm
@@ -99,12 +121,11 @@ function weggeResourcesManager( params ) {
 		if (this.overlay) {
 			this.overlay.remove();
 		}
+		if (this.onManagerExit) {
+			this.onManagerExit();
+		}
 	}
-	
-	this.selectResource = function ( resource_type ) {
-	
-	}
-	
+		
 	this.resourceSaved = function (data) { 		
 		if (!isNaN(data)) {
 			this.resourceBeingEdited.id = parseInt(data);
@@ -119,7 +140,10 @@ function weggeResourcesManager( params ) {
 			this.resourceBeingEdited.applyJSON();
 			var json = this.resourceBeingEdited.getJSON();
 			var jsonString = JSON.stringify(json);
-			$.post("php/saveResource.php", { "resource_id":this.resourceBeingEdited.id,"resource_json":jsonString }, 
+			$.post("php/saveResource.php", 
+				{ 	"resource_id":this.resourceBeingEdited.id,
+					"resource_name":this.resourceBeingEdited.json.name,
+					"resource_json":jsonString }, 
 				_bind(this, this.resourceSaved)
 			);
 		} else {

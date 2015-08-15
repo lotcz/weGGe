@@ -7,7 +7,7 @@ function weggeMesh() {
 	
 	this.json.name = "--mesh--";
 	this.json.type = "Mesh";
-	this.json.model_id = 0;
+	this.json.model_resource_id = 0;
 }
 
 weggeMesh.prototype.initialize = function ( resources ) {
@@ -17,19 +17,18 @@ weggeMesh.prototype.initialize = function ( resources ) {
 
 weggeMesh.prototype.applyJSON = function(resources) {
 	if (resources) {
-		var res = resources.getById( this.json.model_id );	
-		if (res) {
+		var res = resources.getById( this.json.model_resource_id );	
+		if (res && res.geometry && res.material) {
 			this.wrapper = new THREE.Mesh( res.geometry, res.material );	
 		} else {
-			console.log("Model not found:" + this.json.model_id);
+			console.log("Model not found:" + this.json.model_resource_id);
 		}
 	}
 	this.applyBasic();
 }
 
 weggeMesh.prototype.getRequiredResources = function() {
-	var required = [this.json.model_id];
-	return required;
+	return [this.json.model_resource_id];
 }
 
 weggeNode.prototype.availableTypes.push("Mesh");
@@ -43,7 +42,7 @@ function weggeAnimatedMesh() {
 	
 	this.json.name = "--animated-mesh--";
 	this.json.type = "AnimatedMesh";
-	this.json.model_id = 0;
+	this.json.model_resource_id = 0;
 	this.json.duration = 2;
 	this.json.time = 0;
 }
@@ -55,9 +54,11 @@ weggeAnimatedMesh.prototype.initialize = function ( resources ) {
 
 weggeAnimatedMesh.prototype.applyJSON = function(resources) {	
 	if (resources) {
-		var res = resources.getById( this.json.model_id );
-		if (res) {
+		var res = resources.getById( this.json.model_resource_id );
+		if (res && res.geometry && res.material) {
 			this.wrapper = new THREE.MorphAnimMesh( res.geometry, res.material );
+		} else {
+			console.log("Model not initialized:" + this.json.model_resource_id);
 		}
 	}
 	if (this.wrapper) {

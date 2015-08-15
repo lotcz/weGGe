@@ -7,11 +7,72 @@ function weggeViewer( ) {
 	this.host3D = false;
 	this.controls = false;
 	
+	this.keyboard = null;
+	this.keyboardInput = true;
+	
 	this.mouse = null;
 	this.mouseSelect = true;
 	
 	this.ui = new weggeUI();
 	this.info = this.ui.addContainer().css({position:"absolute",bottom:"0px",right:"0px"}).hide();
+	
+	this.start = function() {
+		if (this.level) {			
+			this.resetHost3D();
+			this.ui.showLoading("Starting...");
+			this.host3D = new weggeHost3D();
+			this.level.initialize(this.host3D, this.resources);
+			this.host3D.onAnimationFrame = _bind(this, this.animationFrame);
+			
+			if (!this.controls) {
+				this.controls = new weggeControls({ "camera":this.host3D.camera, element: document });
+				this.controls.resetToDefault();
+				this.controls.movementSpeed = 500;				
+				this.controls.movementEnabled = true;
+				this.controls.onControlsStateChanged = _bind(this, this.controlsStateChanged);
+			}
+			
+			this.controls.initialize( this.host3D.camera, this.level.json.cameraLatitude, this.level.json.cameraLongitude );			
+				
+				
+			if (this.mouse !== null) {
+				this.mouse.destroy();
+				this.mouse = null;
+			}
+			
+			if (this.mouseSelect) {				
+				this.mouse = new weggeMouse(this.level.selectable, this.host3D.camera);
+			}
+			
+			if (this.keyboard !== null) {
+				this.keyboard.destroy();
+				this.keyboard = null;
+			}
+			
+			if (this.keyboardInput) {				
+				//this.keyboard = new weggeKeyboard(this.level.selectable, this.host3D);
+			}
+			
+			/* start */
+			if (!this.level.json.renderingPaused) {
+				this.host3D.startRendering();
+			}
+			
+			if (!this.level.json.animationPaused) {
+				this.host3D.startAnimation();
+			}
+			
+			if (!this.level.json.physicsPaused) {
+				this.host3D.startPhysics();
+			}
+			
+			this.ui.hideLoading();
+			
+			if (this.onLevelLoaded) {
+				this.onLevelLoaded();
+			}
+		}
+	}
 	
 	this.toggleRendering = function() {
 		if (this.host3D) {
@@ -77,7 +138,7 @@ function weggeViewer( ) {
 			this.level.loadFromJSON(data.level_id, data.level_json);
 			var res = this.level.getRequiredResources();
 			if (res.length > 0) {
-				this.loadResources(res.join());
+				this.loadResources(_getArrayForSQL(res));
 			} else {
 				this.start();
 			}
@@ -86,9 +147,9 @@ function weggeViewer( ) {
 		}
 	}
 	
-	this.startLoadingLevel = function( level_id ) {
+	this.startLoadingLevel = function( level_id ) {		
 		this.ui.showLoading("Loading...");
-		this.resetHost3D();
+		//this.resetHost3D();		
 		this.resources = false;
 		$.get("php/loadLevel.php",
 			{level_id: level_id},
@@ -116,7 +177,7 @@ function weggeViewer( ) {
 			.css({left:"150px",right:"150px",top:"170px",bottom:"120px",opacity:1,position:"fixed",zIndex:"99999999999999"});
 		
 		if (levels_json.length > 0) {
-			this.ui.addNodeList( levels_json, _bind(this, this.selectLevel), this.levelList ).css({margin:"auto"});
+			this.ui.addTable( levels_json, _bind(this, this.selectLevel), this.levelList ).css({margin:"auto"});
 		} else {
 			this.levelList.append("No levels available in weGGe database.");
 		}
@@ -147,59 +208,9 @@ function weggeViewer( ) {
 	}
 	
 	this.animationFrame = function(delta) {
-		this.controls.animationFrame(delta);
 		this.level.animationFrame(delta);
-		//if (this.mouseSelect && this.mouse !== null) {this.mouse.animationFrame(delta);}
 	}
 	
-	this.start = function() {
-		if (this.level) {
-			this.resetHost3D();
-			this.host3D = new weggeHost3D();
-			this.level.initialize(this.host3D, this.resources);
-			this.host3D.onAnimationFrame = _bind(this, this.animationFrame);
-		
-			/* init controls */
-			if (!this.controls) {
-				this.controls = new weggeControls({ "camera":this.host3D.camera, element: document });
-				this.controls.resetToDefault();
-				this.controls.movementSpeed = 500;
-				this.controls.movementEnabled = true;
-				this.controls.lookEnabled = _coalesce(this.level.json.lookEnabled,true);
-			}
-			
-			this.controls.initialize( this.host3D.camera, this.level.json.cameraLatitude, this.level.json.cameraLongitude );			
-			
-			if (this.mouse !== null) {
-				this.mouse.destroy();
-				this.mouse = null;
-			}
-			
-			if (this.mouseSelect) {				
-				this.mouse = new weggeMouse(this.level.selectable, this.host3D.camera);
-			}
-			
-			/* start */
-			if (!this.level.json.renderingPaused) {
-				this.host3D.startRendering();
-			}
-			
-			if (!this.level.json.animationPaused) {
-				this.host3D.startAnimation();
-			}
-			
-			if (!this.level.json.physicsPaused) {
-				this.host3D.startPhysics();
-			}
-			
-			this.ui.hideLoading();
-			
-			if (this.onLevelLoaded) {
-				this.onLevelLoaded();
-			}
-		}
-	}
-
 	/* RESOURCES */
 	
 	this.resourcesLoaded = function( resources_json ) { 

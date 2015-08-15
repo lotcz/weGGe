@@ -9,4 +9,3 @@
 	$query = "DELETE FROM levels WHERE level_id = $levelID";
 	
 	$result = $db->query($query) or die("SQL Error - " . mysqli_error($link));		
-?>

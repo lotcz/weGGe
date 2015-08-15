@@ -12,36 +12,55 @@ function weggeSphere() {
 	this.json.heightSegment = 10;
 	this.json.color = "#FF5050";
 	this.json.physics = 1;
+	this.json.material_resource_id = 0;
 	
 }
 
-weggeSphere.prototype.initialize = function() {
+weggeSphere.prototype.initialize = function(resources) {
 	var geometry = new THREE.SphereGeometry(this.json.radius, this.json.widthSegments, this.json.heightSegments);
 	var color = new THREE.Color();
 	color.setStyle(this.json.color);
-	var material = new THREE.MeshPhongMaterial({color:color,ambient:color});
+	
+	var material = null;
+	
+	if (resources) {
+		var res = resources.getById(this.json.material_resource_id);
+		if (res && res.material) {
+			material = res.material;
+		}
+	}
+	
+	if (material === null) {
+		material = new THREE.MeshPhongMaterial({color:color,ambient:color});
+	}
 	
 	if (this.json.physics > 0) {
 		var phy_material = Physijs.createMaterial(
 			material,
-			.8, // medium friction
-			4 // bouncy
+			10, // friction
+			0.7 // bounciness
 		);		
 		this.wrapper = new Physijs.SphereMesh(
 			geometry,
 			phy_material,
 			this.json.mass
 		);
+		/*
 		this.wrapper.addEventListener( 'collision', function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 			// `this` has collided with `other_object` with an impact speed of `relative_velocity` and a rotational force of `relative_rotation` and at normal `contact_normal`
 			console.log("In weggeSphere.prototype.initialize.");
 			console.log(other_object);			
 		});
+		*/
 	} else {		
 		this.wrapper = new THREE.Mesh( geometry, material );
 	}
 	this.applyBasic();
 	return this.wrapper;
+}
+
+weggeSphere.prototype.getRequiredResources = function() {
+	return [this.json.material_resource_id];
 }
 
 weggeNode.prototype.availableTypes.push("Sphere");
@@ -58,52 +77,54 @@ function weggeBox() {
 	this.json.width = 100;
 	this.json.height = 100;
 	this.json.depth = 100;
-	this.json.material_id = 0;
+	this.json.material_resource_id = 0;
 	this.json.color = "#FF5050";
 }
 
 weggeBox.prototype.initialize = function(resources) {
 	var geometry = new THREE.BoxGeometry( this.json.width, this.json.height, this.json.depth );
-	var material = false;
+	var material = null;
 	
 	if (resources) {
-		var res = resources.getById( this.json.material_id );
-		if (res) {
+		var res = resources.getById( this.json.material_resource_id );
+		if (res && res.material) {
 			material = res.material;
-		} 
+		} else {
+			console.log("Material not found:" + this.json.material_resource_id );
+		}
 	}
 	
-	if (!material) {
+	if (material === null) {
 		var color = new THREE.Color();
 		color.setStyle(this.json.color);
 		material = new THREE.MeshLambertMaterial({color:color,ambient:color});
 	}
 	
-	if (this.json.physics > 0) {
-		var phy_material = Physijs.createMaterial(
-			material,
-			.6, // medium friction
-			.3 // low restitution
-		);		
-		this.wrapper = new Physijs.BoxMesh(
-			geometry,
-			phy_material,
-			this.json.mass
-		);	
-	} else {		
-		this.wrapper = new THREE.Mesh( geometry, material );
+	if (material !== null) {
+		if (this.json.physics > 0) {
+			var phy_material = Physijs.createMaterial(
+				material,
+				.6, // medium friction
+				.3 // low restitution
+			);		
+			this.wrapper = new Physijs.BoxMesh(
+				geometry,
+				phy_material,
+				this.json.mass
+			);	
+		} else {		
+			this.wrapper = new THREE.Mesh( geometry, material );
+		}
+	} else {
+		console.log("Material couldn't be initialized.");
 	}
-	
+		
 	this.applyBasic();
 	return this.wrapper;
 }
 
 weggeBox.prototype.getRequiredResources = function() {
-	var required = [];
-	if (this.json.material_id > 0) {
-		required.push(this.json.material_id);
-	}
-	return required;
+	return [this.json.material_resource_id];
 }
 
 weggeNode.prototype.availableTypes.push("Box");

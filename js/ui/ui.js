@@ -92,17 +92,36 @@ function weggeUI( element ) {
 		}
 		row.click(fnc);				
 		this.addNodeProperties(row, node, props);
+		node.element = row;
 	}
 	
-	this.addNodeList = function( nodes, onselect, element ) {
-		var list = $("<table class=\"list\"></table>").appendTo(_coalesce(element, this.element));
+	this.addTable = function( nodes, onselect, element ) {
+		var table = $("<table class=\"list\"></table>").appendTo(_coalesce(element, this.element));
 		
 		for (var i = 0, max = nodes.length; i < max; i++) {
-			this.addNode( nodes[i], onselect, list );
+			this.addNode( nodes[i], onselect, table );
+		}			
+		return table;
+	}
+	
+	this.addValueToList = function( value, onselect, element, props ) {
+		var n;
+		n = $("<div></div>").addClass("tile").appendTo(element).append(value);
+		var fnc = function () {
+			onselect(value);
+		}
+		n.click(fnc);		
+	}
+	
+	this.addList = function( values, onselect, element ) {
+		element = _coalesce(element, this.element);
+		var list = $("<div class=\"list\"></div>").appendTo(element);
+		for (var i = 0, max = values.length; i < max; i++) {
+			this.addValueToList( values[i], onselect, list );			
 		}			
 		return list;
 	}
-		
+	
 	this.showLoading = function(text) {		
 		this.addOverlay();
 		this.loadingDialog.show();		

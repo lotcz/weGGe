@@ -4,19 +4,21 @@
 	
 	global $db;
 		
-	$resourceID = _get('resource_id');
+	$resource_id = _get('resource_id');
+	$resource_name = _get('resource_name');
 	$resource_json = _get('resource_json');;
 	
-	if (($resourceID == 0)||($resourceID == '')) {		
-		$query = "INSERT INTO resources (resource_json) 
-			VALUES ('$resource_json');";
+	if (($resource_id == 0)||($resource_id == '')) {		
+		$query = "INSERT INTO resources (resource_name,resource_json) 
+			VALUES ('$resource_name', '$resource_json');";
 		$result = $db->query($query) or die('SQL error - '.$query);
-		$resourceID = mysqli_insert_id($db);		
+		$resource_id = mysqli_insert_id($db);		
 	} else {
 		$query = "UPDATE resources SET 
-			resource_json = '$resource_json'		
-			WHERE resource_id = $resourceID;";
+			resource_json = '$resource_json',
+			resource_name = '$resource_name'
+			WHERE resource_id = $resource_id;";
 		$result = $db->query($query) or die('SQL error - '.$query);		
 	}
 	
-	echo $resourceID;
+	echo $resource_id;

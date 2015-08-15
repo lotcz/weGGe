@@ -7,7 +7,8 @@ function weggePlane() {
 	
 	this.json.name = "--plane--";
 	this.json.type = "Plane";
-	this.json.material_id = 0;
+	this.json.color = "#1010E0";
+	this.json.material_resource_id = 0;
 }
 
 weggePlane.prototype.initialize = function ( resources ) {
@@ -15,18 +16,20 @@ weggePlane.prototype.initialize = function ( resources ) {
 	
 	var geometry = new THREE.PlaneGeometry(10, 10, 10);
 	
-	var res = resources.getById( this.json.material_id );
-	if (res) {
+	var res = resources.getById( this.json.material_resource_id );
+	if (res && res.material) {
 		material = res.material;
 	} else {
-		material = new THREE.MeshLambertMaterial();
+		var color = new THREE.Color();
+		color.setStyle(this.json.color);
+		material = new THREE.MeshLambertMaterial({color:color});
 	}
 	
 	if (this.json.physics) {
 		var phy_material = Physijs.createMaterial(
 			material,
-			.6, // medium friction
-			.3 // low restitution
+			15, // friction
+			0.7 // restitution
 		);		
 		this.wrapper = new Physijs.PlaneMesh(
 			geometry,
@@ -43,9 +46,7 @@ weggePlane.prototype.initialize = function ( resources ) {
 }
 
 weggePlane.prototype.getRequiredResources = function() {
-	var required = [];
-	required.push(this.json.material_id);
-	return required;
+	return [this.json.material_resource_id];
 }
 
 weggeNode.prototype.availableTypes.push("Plane");

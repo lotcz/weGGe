@@ -24,12 +24,27 @@ weggeResources.prototype.loadFromJSON = function ( json ) {
 	}	
 }
 
-weggeResources.prototype.getById = function ( id ) {
+weggeResources.prototype.getByName = function ( name ) {
 	for (var i = 0, max = this.children.length; i < max; i++ ){
-		if (this.children[i].id == id) {
+		if (this.children[i].json.name == name) {
 			return this.children[i];
 		}
 	}
+	return null;
+}
+
+weggeResources.prototype.getById = function ( id ) {
+	var res = this.getByName(id);
+	if (res !== null) {
+		return res;
+	} else {	
+		for (var i = 0, max = this.children.length; i < max; i++ ){
+			if (this.children[i].id == id) {
+				return this.children[i];
+			}
+		}
+	}
+	return null;
 }
 
 weggeResources.prototype.resourceInitialized = function() {

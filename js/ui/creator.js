@@ -8,51 +8,56 @@ function weggeCreator() {
 	this.mouseSelect = false;
 	
 	this.start = function() {
-		if (this.level && this.resources && this.resources.initialized) {
-			this.resetUI();
-			this.fillLevelTree();
-			this.nodeBeingEdited = this.level;
-					
-			this.resetHost3D();
-			this.host3D = new weggeHost3D();
-			WEGGE_CREATOR_HELPERS = [];
-			this.level.initialize(this.host3D, this.resources);
-			//this.host3D.scene.fog	= new THREE.FogExp2( 0x000000, 0.001 );
+		if (this.resources && this.resources.initialized) {
+			if (this.level) {
+				this.resetUI();
+				this.ui.showLoading("Starting...");
+				this.fillLevelTree();
+				this.nodeBeingEdited = this.level;
+						
+				this.resetHost3D();
+				this.host3D = new weggeHost3D();
+				WEGGE_CREATOR_HELPERS = [];
+				this.level.initialize(this.host3D, this.resources);
+				//this.host3D.scene.fog	= new THREE.FogExp2( 0x000000, 0.001 );
 
-			if (WEGGE_CREATOR_HELPERS.length > 0) {
-				for (var i = WEGGE_CREATOR_HELPERS.length-1; i >= 0; i--) {
-					this.host3D.scene.add(WEGGE_CREATOR_HELPERS[i]);
+				if (WEGGE_CREATOR_HELPERS.length > 0) {
+					for (var i = WEGGE_CREATOR_HELPERS.length-1; i >= 0; i--) {
+						this.host3D.scene.add(WEGGE_CREATOR_HELPERS[i]);
+					}
 				}
-			}
-			this.host3D.onAnimationFrame = _bind(this, this.animationFrame);
-			this.host3D.onHost3DStateChanged = _bind(this, this.host3DStateChanged);
-		
-			if (!this.controls) {
-				this.controls = new weggeControls({ "camera":this.host3D.camera, element: document });
-				this.controls.resetToDefault();
-				this.controls.movementSpeed = 500;				
-				this.controls.movementEnabled = true;
-				this.controls.onControlsStateChanged = _bind(this, this.controlsStateChanged);
-			}
+				this.host3D.onAnimationFrame = _bind(this, this.animationFrame);
+				this.host3D.onHost3DStateChanged = _bind(this, this.host3DStateChanged);
 			
-			this.controls.initialize( this.host3D.camera, this.level.json.cameraLatitude, this.level.json.cameraLongitude );			
-			
-			this.controls.lookEnabled = this.level.json.creator.lookEnabled;
-			this.host3D.renderingPaused = this.level.json.creator.renderingPaused;
-			this.host3D.animationPaused = this.level.json.creator.animationPaused;
-			this.host3D.physicsPaused = this.level.json.creator.physicsPaused;
-			
-			this.updateMenuButtonsHost();
-			this.updateMenuButtonsControls();
-			
-			if (!this.level.json.creator.renderingPaused) {
-				this.host3D.startRendering();
-			}
-			
-		} else {
-			console.log("Level or resources not initialized.");	
-		}
-		this.ui.hideLoading();
+				if (!this.controls) {
+					this.controls = new weggeControls({ "camera":this.host3D.camera, element: document });
+					this.controls.resetToDefault();
+					this.controls.movementSpeed = 500;				
+					this.controls.movementEnabled = true;
+					this.controls.onControlsStateChanged = _bind(this, this.controlsStateChanged);
+				}
+				
+				this.controls.initialize( this.host3D.camera, this.level.json.cameraLatitude, this.level.json.cameraLongitude );			
+				
+				this.controls.lookEnabled = this.level.json.creator.lookEnabled;
+				this.host3D.renderingPaused = this.level.json.creator.renderingPaused;
+				this.host3D.animationPaused = this.level.json.creator.animationPaused;
+				this.host3D.physicsPaused = this.level.json.creator.physicsPaused;
+				
+				this.updateMenuButtonsHost();
+				this.updateMenuButtonsControls();
+				
+				if (!this.level.json.creator.renderingPaused) {
+					this.host3D.startRendering();
+				}						
+			} 
+			this.ui.hideLoading();
+		}		
+	}
+	
+	this.animationFrame = function(delta) {
+		this.controls.animationFrame(delta);
+		this.level.animationFrame(delta);
 	}
 	
 	this.onKeyUp = function ( e ) {
@@ -156,7 +161,7 @@ function weggeCreator() {
 			.css({left:"50px",right:"50px",top:"70px",bottom:"20px",opacity:1,position:"fixed",zIndex:"99999999999999"});
 		
 		if (levels_json.length > 0) {
-			this.ui.addNodeList( levels_json, _bind(this, this.selectLevel), this.levelList ).css({margin:"auto"});
+			this.ui.addTable( levels_json, _bind(this, this.selectLevel), this.levelList ).css({margin:"auto"});
 		} else {
 			this.levelList.append("No levels available in weGGe database.");
 		}
@@ -238,17 +243,30 @@ function weggeCreator() {
 	}
 	
 	/* RESOURCES */
+	
+	this.managerExit = function() {
+		if (this.restartAnimation) {
+			this.restartAnimation = true;
+			this.host3D.startAnimation();
+			this.restartAnimation = false;
+		}
+	}
+	
 	this.resourcesManager = new weggeResourcesManager( { 
 			ui:this.ui,
 			resources:this.resources,
-			onResourceSelected: _bind(this, this.resourceSelected)
+			onResourceSelected: _bind(this, this.resourceSelected),
+			onManagerExit: _bind(this, this.managerExit)
 		}
 	);
-	
+		
 	this.openResourcesManager = function() {
 		if (this.resources) {
 			if (this.host3D) {
-				this.host3D.stopAnimation();
+				if (!this.host3D.animationPaused) {
+					this.restartAnimation = true;
+					this.host3D.stopAnimation();
+				}
 			}
 			this.resourcesManager.show(this.resources);
 		} else {
@@ -289,7 +307,8 @@ function weggeCreator() {
 		this.nodeTypeForm = this.ui.addContainer();
 		this.nodeTypeForm.css({top:"70px",display:"inline-block",position:"absolute",paddingRight:"15px",paddingBottom:"10px",paddingLeft:"15px"});
 		weggeNode.prototype.availableTypes.sort();
-		this.ui.addNodeList( weggeNode.prototype.availableTypes, _bind(this, this.nodeTypeSelected), this.nodeTypeForm );
+		this.ui.addList( weggeNode.prototype.availableTypes, _bind(this, this.nodeTypeSelected), this.nodeTypeForm );
+		
 		this.ui.addMenu( {
 				links: [
 							{title:'Cancel',onselect:_bind(this, this.nodeTypeCancel)},

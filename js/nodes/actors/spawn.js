@@ -7,8 +7,17 @@ function weggeSpawnActor() {
 	
 	this.json.type = "SpawnActor";
 	this.json.name = "spawn_actor_";	
-	
-	
+	this.json.crosshair_name = "target";
+	this.crosshair = null;
+}
+
+weggeSpawnActor.prototype.initActor = function(level) {
+	if (this.json.target_name.length > 0) {
+		this.target = level.findNodeByName(this.json.target_name);
+	}
+	if (this.json.crosshair_name.length > 0) {
+		this.crosshair = level.findNodeByName(this.json.crosshair_name);
+	}
 }
 
 weggeSpawnActor.prototype.spawn = function(args) {
@@ -18,16 +27,19 @@ weggeSpawnActor.prototype.spawn = function(args) {
 		ball.json.scale = [1,1,1];
 		ball.json.radius = 50;
 		ball.json.mass = 2;
+				
+		var _vector = _v(0,0,0);
+		var wp = this.target.wrapper.localToWorld ( _v(0,0,0) );
+		var cp = this.crosshair.wrapper.localToWorld ( _v(0,0,0) );
+		
+		_vector.copy(cp);
+		_vector.sub(wp);
+		_vector.multiplyScalar(10);
 		var wrapper = ball.initialize();
-		wrapper.position.copy(this.target.wrapper.position);
+		wrapper.position.copy(wp);
 		wrapper.__dirtyPosition = true;
-		this.target.wrapper.parent.add(wrapper);
-		
-		var _vector = _v(1,1,0);
-		_vector.multiplyScalar(3000);
-		//_vector.copy( this.target.wrapper.rotation ).multiplyScalar(1000);
-		
-		wrapper.applyCentralImpulse(_vector);						
+		this.target.wrapper.parent.parent.parent.add(wrapper);
+		wrapper.applyCentralImpulse(_vector);
 	}
 }
 

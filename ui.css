@@ -77,7 +77,8 @@ body {
 	background-color:#909090;
 }
 
-#ui .main-menu {
+#ui .main-menu,
+#ui .resources ul.menu {
 	font-size:5mm;
 }
 
@@ -86,7 +87,8 @@ body {
 	margin-top:0;
 }
 
-#ui .main-menu ul.menu li {
+#ui .main-menu ul.menu li,
+#ui .resources ul.menu li  {
 	padding:5px 15px;
 	margin-right:20px;
 	border-radius:10px;
@@ -105,7 +107,8 @@ body {
 	cursor:pointer;
 }
 
-#ui ul.node-tree a.selected {	
+#ui ul.node-tree a.selected ,
+#ui .resources .list tr.selected {	
 	font-weight:bold;
 	cursor:default;
 	color:#A0FFA0;
@@ -124,14 +127,14 @@ body {
 }
 
 #ui .form-item input {
-	width:70%;
+	max-width:70%;
 	font-family:monospace;
 	display:inline-block;
 	margin:1px;
 }
 
 #ui .form-item label {
-	width:25%;
+	min-width:25%;
 	display:inline-block;
 }
 
@@ -150,15 +153,21 @@ body {
 
 }
 
-#ui .list td {
+#ui .list td , #ui .tile {
 	cursor:pointer;
 	padding:10px;
 	margin:2px;
 	background-color:#202030;
 }
 
-#ui .list tr:hover, #ui .list td:hover {
+#ui .list tr:hover td {
 	background-color:#404060;
+}
+
+#ui .tile {
+	float: left;
+    display: inline-block;
+    width: 150px;
 }
 
 #ui .border {

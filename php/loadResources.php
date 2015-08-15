@@ -7,7 +7,8 @@
 	$ids = _get('ids');
 	
 	if (strlen($ids) > 0) {
-		$query = "SELECT * FROM resources WHERE resource_id IN ( $ids )";
+		$query = "SELECT * FROM resources WHERE resource_id IN ( $ids ) OR resource_name IN ( $ids );";
+		//echo "SELECT * FROM resources WHERE resource_id IN ( $ids ) OR resource_name IN ( $ids );";
 	} else {
 		$query = "SELECT * FROM resources";
 	}

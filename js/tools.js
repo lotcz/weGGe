@@ -82,12 +82,35 @@ function _round( num, digits ) {
 	return Math.round(num * x) / x;
 }
 
+function _boolToInt(b) {
+	return (b) ? 1 : 0; 
+}
+
+function _isNumeric(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
 function _isObject( o ) {
 	return ((o !== null) && (typeof o === 'object'));
 }
 
 function _isArray( a ) {
 	return (Object.prototype.toString.call( a ) === '[object Array]' );
+}
+
+function _getArrayForSQL(arr) {
+	var s = "";
+	for (var i = 0,max = arr.length; i < max; i++) {
+		if (_isNumeric(arr[i])) {
+			s += arr[i] + ','
+		} else {
+			s+= '\'' + arr[i] + '\',';
+		}
+	}
+	if (s.length > 0) {
+		s = s.substr(0,s.length-1);
+	}
+	return s;
 }
 
 function _getJSON( url, onsuccess, onerror ) {
@@ -133,6 +156,8 @@ function _getTypeName (obj) {
 	}
 };
 
+/* VECTORS */
+
 function _v(x, y, z) {
 	return _arrayToVector([x,y,z]);
 }
@@ -155,10 +180,6 @@ function _getColorHex( style ) {
 	var c = new THREE.Color();
 	c.setStyle(style);
 	return c.getHex();
-}
-
-function _boolToInt(b) {
-	return (b) ? 1 : 0; 
 }
 
 function _randomColor() {
