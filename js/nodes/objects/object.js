@@ -67,4 +67,12 @@ weggeObject.prototype.initialize = function ( resources ) {
 	return this.wrapper;
 }
 
+weggeObject.prototype.removeFromScene = function() {
+	if (this.wrapper && this.wrapper.parent) {
+		this.wrapper.parent.remove(this.wrapper);
+		this.wrapper = undefined;
+	}
+}
+
+
 weggeNode.prototype.availableTypes.push("Object");

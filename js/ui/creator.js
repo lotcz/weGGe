@@ -297,7 +297,10 @@ function weggeCreator() {
 		if (this.nodeBeingEdited && (this.nodeBeingEdited !== this.level)) {
 			this.nodeBeingEdited.treeContainer.remove();
 			this.level.removeNode(this.nodeBeingEdited);
+			this.hideTransformControls();
+			this.nodeBeingEdited.removeFromScene();			
 			this.nodeCancel();
+			this.nodeBeingEdited = false;
 		}
 	}
 	
@@ -410,7 +413,8 @@ function weggeCreator() {
 			var expand = function() {
 				this.slideToggle(); // this is binded to sub :-)
 			}
-			var expander = $("<a>&nbsp; [+-]</a>").appendTo(el).click( _bind(sub,expand) );
+			el.append("&nbsp; ");
+			var expander = $("<a>[+-]</a>").appendTo(el).click( _bind(sub,expand) );
 						
 			for (var i = 0, max = node.children.length; i < max ; i++) {
 				sub.append( this.addTreeNode(node.children[i]) );
@@ -458,10 +462,7 @@ function weggeCreator() {
 			this.levelNodeTree.empty();
 			this.levelTreeNode = false;
 		}
-		if (this.level) {
-			var el = $("<ul class=\"node-tree\"></ul>").appendTo(this.levelNodeTree);
-			this.levelTreeNode = this.addTreeNode(this.level);
-			el.append( this.levelTreeNode );
+		if (this.level) {			
 			/* node menu */
 			this.ui.addMenu( {
 					links: [
@@ -473,10 +474,16 @@ function weggeCreator() {
 						{title:'◄',onselect:_bind(this, this.moveNodeLeft)},
 						{title:'►',onselect:_bind(this, this.moveNodeRight)},						
 					],
-					css:{fontSize:"4mm", marginTop:"10px", marginBottom:"10px"},
+					css:{fontSize:"4mm",marginTop:"0px",marginBottom:"10px",height:"25px"},
 					element:this.levelNodeTree
 				}
 			);
+			
+			var treeWrapper = $("<div></div>").css({height:"calc(100% - 55px)",overflow:"auto"}).appendTo(this.levelNodeTree);
+			var el = $("<ul class=\"node-tree\"></ul>").appendTo(treeWrapper);
+			this.levelTreeNode = this.addTreeNode(this.level);
+			el.append( this.levelTreeNode );
+			
 			this.updateNodeTreeLinks();
 		}
 	}
@@ -558,7 +565,7 @@ function weggeCreator() {
 	/* NODE TREE */
 	
 	this.levelNodeTree = this.ui.addContainer().addClass("noselect");
-	this.levelNodeTree.css({top:"70px",left:"0px",minWidth:"250px",maxWidth:"50%",width:"auto",display:"inline-block"/*,height:"100%"*/});
+	this.levelNodeTree.css({minWidth:"250px",maxWidth:"50%",height:"calc(100% - 55px)",width:"auto",display:"inline-block"});
 	
 	/* INIT */
 	

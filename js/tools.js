@@ -82,6 +82,10 @@ function _round( num, digits ) {
 	return Math.round(num * x) / x;
 }
 
+function _b( b ) {
+	return (b !== null) && (b != "0") && b;
+}
+
 function _boolToInt(b) {
 	return (b) ? 1 : 0; 
 }

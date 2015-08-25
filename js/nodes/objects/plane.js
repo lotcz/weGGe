@@ -25,7 +25,7 @@ weggePlane.prototype.initialize = function ( resources ) {
 		material = new THREE.MeshLambertMaterial({color:color});
 	}
 	
-	if (this.json.physics) {
+	if (_b(this.json.physics)) {
 		var phy_material = Physijs.createMaterial(
 			material,
 			15, // friction

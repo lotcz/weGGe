@@ -24,6 +24,10 @@ weggeNode.prototype.removeNode = function( node ) {
 	}
 }
 
+weggeNode.prototype.removeFromScene = function() {
+
+}
+
 /* set this.json.children = this.getChildrenJSON() to gather json from all node's children */
 weggeNode.prototype.getChildrenJSON = function() {
 	var children = [];
