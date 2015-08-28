@@ -72,7 +72,7 @@ function weggeHost3D() {
 	this.destroy = function () {
 		this.stopRendering();
 		this.initialized = false;
-		window.removeEventListener( 'resize',this.resizeClosure , false );
+		window.removeEventListener( 'resize',this.resizeClosure );
 		this.container.remove();
 		$(this.stats.domElement).remove();
 		this.stateChanged();

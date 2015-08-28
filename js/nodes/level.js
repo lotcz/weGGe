@@ -33,6 +33,10 @@ function weggeLevel() {
 	this.host3D = false;
 }
 
+weggeLevel.prototype.addChildWrapper = function ( wrapper ) {	
+	this.host3D.scene.add(wrapper);
+}
+
 weggeLevel.prototype.applyJSON = function() {
 	if (this.host3D) {
 		this.host3D.renderer.setClearColor( _coalesce(this.json.clearColor, 0x101010) );
@@ -143,10 +147,8 @@ weggeLevel.prototype.initialize = function ( host3D, resources ) {
 		this.host3D.initScene(this.json);
 	}
 	
-	var wrappers = [];	
-	for (var i = 0, max = this.children.length; i < max; i++ ) {
-		_append(wrappers, this.children[i].initialize(resources));
-	}
+	var wrappers = this.initializeChildren(resources);
+	
 	for (var i = 0, max = wrappers.length; i < max; i++ ) {
 		this.host3D.scene.add(wrappers[i]);
 	}

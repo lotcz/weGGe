@@ -74,6 +74,15 @@ function weggeViewer( ) {
 		}
 	}
 	
+	this.destroyViewer = function() {
+		this.mouse.destroy();
+		this.mouse = null;
+		this.keyboard.destroy();
+		this.keyboard = null;
+		this.resetHost3D();
+		document.removeEventListener( 'keyup', this.onKeyUpClosure );
+	}
+	
 	this.toggleRendering = function() {
 		if (this.host3D) {
 			this.host3D.toggleRendering();
@@ -232,7 +241,9 @@ function weggeViewer( ) {
 		);
 	}
 		
-	document.addEventListener( 'keyup', _bind( this, this.onKeyUp ), false );
+	this.onKeyUpClosure = _bind( this, this.onKeyUp );
+	
+	document.addEventListener( 'keyup', this.onKeyUpClosure );
 }
 
 

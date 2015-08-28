@@ -41,12 +41,12 @@ weggeObject.prototype.applyBasic = function() {
 
 /* call this.initializeChildren(resources) to initialize all children from resources */
 weggeObject.prototype.initializeChildren = function ( resources ) {
-	var child_wrapper;	
+	var child_wrappers = [];	
 	for ( var i = 0, max = this.children.length; i < max; i++) {
-		child_wrapper = this.children[i].initialize(resources);
-		if (child_wrapper) {
-			this.addChildWrapper(child_wrapper);
-		}
+		_append(child_wrappers, this.children[i].initialize(resources));		
+	}
+	for ( var x = 0, maxX = child_wrappers.length; x < maxX; x++) {
+		this.addChildWrapper(child_wrappers[x]);
 	}
 }
 

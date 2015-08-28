@@ -20,12 +20,12 @@ weggeMesh.prototype.applyJSON = function(resources) {
 		var res = resources.getById( this.json.model_resource_id );	
 		if (res && res.geometry && res.material) {
 			if (_b(this.json.physics)) {
-			var phy_material = Physijs.createMaterial(
-				res.material,
-				10, // friction
-				0.7 // bounciness
-			);		
-				this.wrapper = new Physijs.ConvexMesh(res.geometry, phy_material );
+				var phy_material = Physijs.createMaterial(
+					res.material,
+					.6, // friction
+					.7 // bounciness
+				);		
+				this.wrapper = new Physijs.CapsuleMesh(res.geometry, phy_material, this.json.mass );
 			} else {
 				this.wrapper = new THREE.Mesh( res.geometry, res.material );	
 			}

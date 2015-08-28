@@ -11,11 +11,11 @@ function weggeResourcesManager( params ) {
 		this.overlay = this.ui.addOverlay();
 		if (!this.container) {
 			this.container = this.ui.addContainer()
-				.css({left:"0px",right:"0px",top:"70px",bottom:"0px",opacity:1,position:"fixed",zIndex:"99999999999999"})
+				.css({left:"0px",right:"0px",height:"100%",top:"0px",bottom:"0px",opacity:1,position:"fixed",zIndex:"99999999999999"})
 				.addClass("resources");
-			this.innerContainer = this.ui.addContainer(this.container).addClass("border");			
-			this.resourcesList = this.ui.addContainer(this.innerContainer).addClass("column half");
-			this.resourceForm = this.ui.addContainer(this.innerContainer).addClass("column half");
+			this.innerContainer = this.ui.addContainer(this.container).addClass("border").css({height:"calc(100% - 60px)"});			
+			this.resourcesList = this.ui.addContainer(this.innerContainer).addClass("column").css({overflow:"auto",height:"calc(100% - 44px)",width:"40%",minWidth:"250px"});
+			this.resourceForm = this.ui.addContainer(this.innerContainer).addClass("column").css({paddingLeft:"10%",width:"40%"});
 					
 			this.ui.addCleaner(this.innerContainer);
 					
@@ -91,6 +91,20 @@ function weggeResourcesManager( params ) {
 		);		
 	}
 	
+	this.cloneResource = function() {
+		var resource = weggeNode.prototype.createNode(this.resourceBeingEdited.json);
+		this.resources.children.push(resource);
+		this.ui.addNode(resource, _bind(this, this.editResource), this.resourcesInnerList, ["json","name","type","path"]);
+		this.editResource(resource);
+	}
+	
+	/* RESOURCE PREVIEW */
+	this.ui.addResourcePreview = function( element, resource ) {
+		if (resource && resource.renderPreview) {
+			element.append(resource.renderPreview());
+		}
+	}
+	
 	this.editResource = function( resource ) {		
 		this.resourceForm.empty();
 		this.resourceBeingEdited = resource;
@@ -99,6 +113,8 @@ function weggeResourcesManager( params ) {
 			$(this.resourceBeingEdited.element).addClass("selected");
 		}
 		this.ui.addFormItems( this.resourceForm, resource.json );
+		this.ui.addCleaner( this.resourceForm );
+		this.ui.addResourcePreview( this.resourceForm, resource );
 		this.ui.addCleaner( this.resourceForm );
 		this.ui.addMenu( {
 				links: [

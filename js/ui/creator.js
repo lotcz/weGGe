@@ -409,16 +409,21 @@ function weggeCreator() {
 		node.treeContainer = el;
 				
 		if (node.children && node.children.length > 0) {		
-			var sub = $("<ul class=\"node-tree\"></ul>").appendTo(el);
+			node.subTree = $("<ul class=\"node-tree\"></ul>").appendTo(el);			
 			var expand = function() {
-				this.slideToggle(); // this is binded to sub :-)
+				this.subTree.slideToggle(); // this is binded to node :-)
+				this.collapse();
 			}
 			el.append("&nbsp; ");
-			var expander = $("<a>[+-]</a>").appendTo(el).click( _bind(sub,expand) );
+			var expander = $("<a>[+-]</a>").appendTo(el).click( _bind(node,expand) );
 						
 			for (var i = 0, max = node.children.length; i < max ; i++) {
-				sub.append( this.addTreeNode(node.children[i]) );
-			}			
+				node.subTree.append( this.addTreeNode(node.children[i]) );
+			}
+			
+			if (node.json.creator && _b(node.json.creator.collapsed)) {
+				node.subTree.hide();
+			}
 		}
 		return el;
 	}

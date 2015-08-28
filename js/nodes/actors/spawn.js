@@ -38,7 +38,7 @@ weggeSpawnActor.prototype.spawn = function(args) {
 		var wrapper = ball.initialize();
 		wrapper.position.copy(wp);
 		wrapper.__dirtyPosition = true;
-		this.target.wrapper.parent.parent.parent.add(wrapper);
+		this.target.addWrapperToParent(wrapper);
 		wrapper.applyCentralImpulse(_vector);
 	}
 }

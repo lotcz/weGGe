@@ -25,9 +25,11 @@ function weggeMouse(selectable, camera) {
 		}
 	};
 	
+	this.mouseDownClosure = _bind(this,this.mouseDown);
+	
 	this.destroy = function() {
-		document.removeEventListener( 'mousedown', _bind(this,this.mouseDown) );
+		document.removeEventListener( 'mousedown', this.mouseDownClosure );
 	}
 	
-	document.addEventListener( 'mousedown', _bind(this,this.mouseDown) );
+	document.addEventListener( 'mousedown', this.mouseDownClosure );
 }

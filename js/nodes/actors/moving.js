@@ -13,13 +13,17 @@ function weggeMovingActor() {
 
 weggeMovingActor.prototype.moveForward = function(args) {
 	if (this.target !== null && this.target.wrapper) {
-		this.target.wrapper.translateZ( parseFloat(this.json.move_amount) );
+		var amount;
+		if (_isNumeric(args)) amount = parseFloat(args);
+			this.target.wrapper.translateZ( parseFloat(_coalesce(amount,this.json.move_amount)) );
 	}
 }
 
 weggeMovingActor.prototype.moveBackward = function(args) {
 	if (this.target !== null && this.target.wrapper) {
-		this.target.wrapper.translateZ( -parseFloat(this.json.move_amount) );
+		var amount;
+		if (_isNumeric(args)) amount = parseFloat(args);
+		this.target.wrapper.translateZ( -parseFloat(_coalesce(amount,this.json.move_amount)) );
 	}
 }
 

@@ -83,7 +83,7 @@ function _round( num, digits ) {
 }
 
 function _b( b ) {
-	return (b !== null) && (b != "0") && b;
+	return (b !== null) && (b != "0") && (b != "false") && b;
 }
 
 function _boolToInt(b) {

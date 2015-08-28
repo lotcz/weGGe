@@ -179,3 +179,9 @@ body {
 	padding:15px;
 	margin:15px;
 }
+
+#ui div.resources,
+#ui div.resources .container {
+	background-color:Black;
+	opacity:1;
+}

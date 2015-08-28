@@ -18,6 +18,7 @@ weggeClickableActor.prototype.initActor = function(level) {
 		this.target = level.findNodeByName(this.json.target_name);
 	}
 	if (this.target && this.target.wrapper) {
+		this.target.wrapper.selectable = true;
 		this.target.wrapper.clickable = true;
 		this.target.wrapper.onClick = _bind(this,this.click);
 	}

@@ -6,6 +6,12 @@ function weggeResources() {
 	this.initialized = false;
 }
 
+weggeNode.prototype.addResource = function(json, id) {	
+	var resource = this.createNode(json);
+	resource.id = id;
+	this.children.push( resource );	
+}
+
 weggeResources.prototype.loadFromJSON = function ( json ) {	
 	this.initialized = false;
 	var resource, resource_id, resource_json;	
@@ -13,9 +19,7 @@ weggeResources.prototype.loadFromJSON = function ( json ) {
 		resource_id = json[i].resource_id;
 		try {
 			resource_json = JSON.parse( json[i].resource_json );	
-			resource = new window["wegge" + resource_json.type]();
-			resource.loadFromJSON( parseInt(resource_id), resource_json);
-			this.children.push( resource );		
+			this.addResource( resource_json, parseInt(resource_id));			
 		} catch (e) {
 			resource_json = {};
 			console.log("Resource " + resource_id + ", \"" + json[i].resource_json + "\" is not valid JSON.");

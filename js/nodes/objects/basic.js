@@ -37,8 +37,8 @@ weggeSphere.prototype.initialize = function(resources) {
 	if (this.json.physics > 0) {
 		var phy_material = Physijs.createMaterial(
 			material,
-			10, // friction
-			0.7 // bounciness
+			.6, // friction
+			1 // bounciness
 		);		
 		this.wrapper = new Physijs.SphereMesh(
 			geometry,
@@ -105,7 +105,7 @@ weggeBox.prototype.initialize = function(resources) {
 			var phy_material = Physijs.createMaterial(
 				material,
 				.6, // medium friction
-				.3 // low restitution
+				.7 // low restitution
 			);		
 			this.wrapper = new Physijs.BoxMesh(
 				geometry,
@@ -129,6 +129,86 @@ weggeBox.prototype.getRequiredResources = function() {
 
 weggeNode.prototype.availableTypes.push("Box");
 
+weggeCylinder.prototype = new weggeObject();
+weggeCylinder.prototype.constructor = weggeCylinder; 
+
+function weggeCylinder() {
+	this.base = weggeObject;
+	this.base();
+	
+	this.json.name = "--Cylinder--";
+	this.json.type = "Cylinder";
+	this.json.radiusTop = 20;
+	this.json.radiusBottom = 20;
+	this.json.height = 100;
+	this.json.radiusSegments = 8;
+	this.json.heightSegments = 1;
+	this.json.openEnded = 0;
+	//this.json.thetaStart = 100;
+	//this.json.thetaLength = 100;
+	this.json.material_resource_id = "basic_material";
+	this.json.color = "#FF5050";
+}
+
+weggeCylinder.prototype.initialize = function(resources) {
+	/*
+	CylinderGeometry(radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded, thetaStart, thetaLength)
+
+	radiusTop — Radius of the cylinder at the top. Default is 20.
+	radiusBottom — Radius of the cylinder at the bottom. Default is 20.
+	height — Height of the cylinder. Default is 100.
+	radiusSegments — Number of segmented faces around the circumference of the cylinder. Default is 8
+	heightSegments — Number of rows of faces along the height of the cylinder. Default is 1.
+	openEnded — A Boolean indicating whether the ends of the cylinder are open or capped. Default is false, meaning capped.
+	thetaStart — Start angle for first segment, default = 0 (three o'clock position).
+	thetaLength — The central angle, often called theta, of the circular sector. The default is 2*Pi, which makes for a complete cylinder.
+	*/
+	var geometry = new THREE.CylinderGeometry( parseInt(this.json.radiusTop), parseInt(this.json.radiusBottom), parseInt(this.json.height), parseInt(this.json.radiusSegments), parseInt(this.json.heightSegments), _b(this.json.openEnded) );
+	var material = null;
+	
+	if (resources) {
+		var res = resources.getById( this.json.material_resource_id );
+		if (res && res.material) {
+			material = res.material;
+		} else {
+			console.log("Material not found:" + this.json.material_resource_id );
+		}
+	}
+	
+	if (material === null) {
+		var color = new THREE.Color();
+		color.setStyle(this.json.color);
+		material = new THREE.MeshLambertMaterial({color:color,ambient:color});
+	}
+	
+	if (material !== null) {
+		if (this.json.physics > 0) {
+			var phy_material = Physijs.createMaterial(
+				material,
+				.6, // medium friction
+				.7 // low restitution
+			);		
+			this.wrapper = new Physijs.CylinderMesh(
+				geometry,
+				phy_material,
+				this.json.mass
+			);	
+		} else {		
+			this.wrapper = new THREE.Mesh( geometry, material );
+		}
+	} else {
+		console.log("Material couldn't be initialized.");
+	}
+		
+	this.applyBasic();
+	return this.wrapper;
+}
+
+weggeCylinder.prototype.getRequiredResources = function() {
+	return [this.json.material_resource_id];
+}
+
+weggeNode.prototype.availableTypes.push("Cylinder");
 weggeRing.prototype = new weggeObject();
 weggeRing.prototype.constructor = weggeRing; 
 

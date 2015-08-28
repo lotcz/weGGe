@@ -24,6 +24,16 @@ weggeNode.prototype.removeNode = function( node ) {
 	}
 }
 
+weggeNode.prototype.addWrapperToParent = function(wrapper) {
+	if (this.parent) {
+		if (this.parent.addChildWrapper) {
+			this.parent.addChildWrapper(wrapper);
+		} else {
+			this.parent.addWrapperToParent(wrapper);
+		}
+	}
+}
+
 weggeNode.prototype.removeFromScene = function() {
 
 }
@@ -119,6 +129,16 @@ weggeNode.prototype.loadChildrenFromJSON = function(json) {
 			child = this.createNode(json.children[i]);			
 			this.addChild(child);			
 		}
+	}
+}
+
+/* inherit and update scene from here */
+weggeNode.prototype.collapse = function() {
+	if (!this.json.creator) {
+		this.json.creator = {};
+		this.json.creator.collapsed = true;
+	} else {
+		this.json.creator.collapsed = !_b(this.json.creator.collapsed);
 	}
 }
 
