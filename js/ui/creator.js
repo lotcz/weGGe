@@ -5,7 +5,8 @@ function weggeCreator() {
 	this.base = weggeViewer;
 	this.base();
 	
-	this.mouseSelect = false;
+	this.mouseEnabled = false;
+	this.controlsEnabled = true;
 	
 	this.start = function() {
 		if (this.resources && this.resources.initialized) {
@@ -29,6 +30,10 @@ function weggeCreator() {
 				this.host3D.onAnimationFrame = _bind(this, this.animationFrame);
 				this.host3D.onHost3DStateChanged = _bind(this, this.host3DStateChanged);
 			
+				// stats
+				this.host3D.initStats();
+				
+				//controls
 				if (!this.controls) {
 					this.controls = new weggeControls({ "camera":this.host3D.camera, element: document });
 					this.controls.resetToDefault();
@@ -36,10 +41,10 @@ function weggeCreator() {
 					this.controls.movementEnabled = true;
 					this.controls.onControlsStateChanged = _bind(this, this.controlsStateChanged);
 				}
-				
+						
 				this.controls.initialize( this.host3D.camera, this.level.json.cameraLatitude, this.level.json.cameraLongitude );			
-				
 				this.controls.lookEnabled = this.level.json.creator.lookEnabled;
+				
 				this.host3D.renderingPaused = this.level.json.creator.renderingPaused;
 				this.host3D.animationPaused = this.level.json.creator.animationPaused;
 				this.host3D.physicsPaused = this.level.json.creator.physicsPaused;
@@ -194,7 +199,7 @@ function weggeCreator() {
 	this.reloadAfterSave = false;
 	
 	this.saveAndReload = function() {
-		this.reloadAfterSave  = true;
+		this.reloadAfterSave = true;
 		this.saveLevel();
 	}
 		
@@ -344,6 +349,21 @@ function weggeCreator() {
 		}
 	}
 	
+	this.updateNodeFormCollapse = function() {
+		if (_b(this.level.json.creator.formCollapsed)) {
+			this.nodeFormCollapsible.css({height:"0"});
+		} else {
+			this.nodeFormCollapsible.css({height:"auto"});
+		}
+	}
+	
+	this.collapseNodeForm = function() {
+		if (this.level && this.level.json) {
+			this.level.json.creator.formCollapsed = !_b(this.level.json.creator.formCollapsed);
+			this.updateNodeFormCollapse();
+		}		
+	}
+	
 	this.renderNodeForm = function(node, onsave) {
 		this.nodeBeingEdited  = node;
 		this.nodeCancel();
@@ -353,20 +373,26 @@ function weggeCreator() {
 		this.nodeForm.mouseenter( _bind(this,this.hideTransformControls) );
 		this.nodeForm.mouseleave( _bind(this,this.showTransformControls) );	
 		this.nodeForm.css({top:"70px",display:"inline-block",width:"450px",position:"absolute",paddingRight:"15px",paddingBottom:"10px",maxHeight:"85%",overflow:"auto"});
-		this.ui.addFormItems( this.nodeForm, node.json );
+		
+		this.nodeFormCollapsible = this.ui.addContainer(this.nodeForm).css({overflow:"hidden"});
+		this.ui.addFormItems( this.nodeFormCollapsible, node.json );		
+		this.updateNodeFormCollapse();
+		
 		this.ui.addMenu( {
 				links: [
 							{title:'Save',onselect: _coalesce(onsave, _bind(this, this.nodeSave))},
 							{title:'Look at',onselect: _bind(this, this.lookAt)},
 							{title:'Cancel',onselect:_bind(this, this.nodeCancel)},
+							{title:'Collapse/Uncollapse',onselect:_bind(this, this.collapseNodeForm)},
 						],
 				css:{top:0,left:0},
 				element:this.nodeForm
 			}
-		);
+		);		
 	}
 	
 	this.lookAt = function() {
+		this.host3D.lookAt(this.nodeBeingEdited.wrapper.position);
 		this.controls.lookAt(this.nodeBeingEdited.wrapper.position);		
 	}
 	

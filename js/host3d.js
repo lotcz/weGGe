@@ -13,6 +13,7 @@ function weggeHost3D() {
 	this.width = 320;
 	this.height = 200;	
 	this.stats = false;
+	this.initialized = false;
 	
 	this.initState = function(json) {
 		this.renderingPaused = _coalesce(json.renderingPaused,0);
@@ -64,18 +65,9 @@ function weggeHost3D() {
 		this.stats.setMode(0); // 0: fps, 1: ms
 		this.stats.domElement.style.position = 'absolute';
 		this.stats.domElement.style.zIndex = 10000000;
-		this.stats.domElement.style.left = '10px';
+		this.stats.domElement.style.right = '10px';
 		this.stats.domElement.style.top = '10px';
 		document.body.appendChild( this.stats.domElement );
-	}
-	
-	this.destroy = function () {
-		this.stopRendering();
-		this.initialized = false;
-		window.removeEventListener( 'resize',this.resizeClosure );
-		this.container.remove();
-		$(this.stats.domElement).remove();
-		this.stateChanged();
 	}
 	
 	this.startRendering = function() {
@@ -170,6 +162,17 @@ function weggeHost3D() {
 
 	this.resizeClosure = _bind( this, this.onWindowResize);
 	
-	window.addEventListener( 'resize',this.resizeClosure, false );
-	this.initialized = false;
+	this.destroy = function () {
+		this.stopRendering();
+		this.initialized = false;
+		window.removeEventListener( 'resize',this.resizeClosure );
+		this.container.remove();
+		$(this.stats.domElement).remove();
+		this.camera = null;
+		this.scene = null;
+		//this.stateChanged();
+	}
+	
+	window.addEventListener( 'resize', this.resizeClosure);
+	
 }				

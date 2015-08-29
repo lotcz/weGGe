@@ -9,12 +9,7 @@
 	<body>	
 	</body>
 
-	<script src="lib/three.min.js" language="javascript"></script>	
-	<script src="lib/stats.min.js" language="javascript"></script>
-	<script src="lib/jquery.min.js" language="javascript"></script>
-	<script src="lib/three.min.js" language="javascript"></script>	
-	<script src="lib/helvetiker_regular.typeface.js" language="javascript"></script>
-	
+	<script src="lib/three.js" language="javascript"></script>	
 	<script src="lib/physi.js" language="javascript"></script>	
 	<script>
 		'use strict';
@@ -23,138 +18,140 @@
 		Physijs.scripts.ammo = 'ammo.js';
 	</script>
 	
+	<script src="lib/jquery.min.js" language="javascript"></script>
+	<script src="lib/helvetiker_regular.typeface.js" language="javascript"></script>
+
 	<script src="js/tools.js" language="javascript"></script>
 	<script src="js/host3d.js" language="javascript"></script>
 	<script src="js/controls.js" language="javascript"></script>
-	<script src="js/textSprites.js" language="javascript"></script>
-	
-	<script src="js/nodes/node.js" language="javascript"></script>
-	<script src="js/nodes/objects/object.js" language="javascript"></script>
+
+	<script src="js/nodes/node.js" language="javascript"></script>	
 	<script src="js/nodes/level.js" language="javascript"></script>
-	<script src="js/nodes/objects/axis.js" language="javascript"></script>	
+	<script src="js/nodes/objects/object.js" language="javascript"></script>
+	<script src="js/nodes/objects/group.js" language="javascript"></script>
 	<script src="js/nodes/objects/basic.js" language="javascript"></script>
-	<script src="js/nodes/objects/lights.js" language="javascript"></script>
-	<script src="js/nodes/objects/plane.js" language="javascript"></script>
 	<script src="js/nodes/objects/mesh.js" language="javascript"></script>
-	<script src="js/nodes/objects/skybox.js" language="javascript"></script>
+	
 	<script src="js/nodes/resources/resources.js" language="javascript"></script>
 	<script src="js/nodes/resources/resource.js" language="javascript"></script>
-	<script src="js/nodes/resources/model.js" language="javascript"></script>
+	<script src="js/nodes/resources/material.js" language="javascript"></script>
+	<script src="js/nodes/resources/phy_material.js" language="javascript"></script>
 	<script src="js/nodes/resources/texture.js" language="javascript"></script>
+	<script src="js/nodes/resources/model.js" language="javascript"></script>
+	
 	<script src="js/nodes/actors/actor.js" language="javascript"></script>
-
+	<script src="js/nodes/actors/clickable.js" language="javascript"></script>
+	<script src="js/nodes/actors/moving.js" language="javascript"></script>
+	<script src="js/nodes/actors/turning.js" language="javascript"></script>
+	<script src="js/nodes/actors/spawn.js" language="javascript"></script>
+	<script src="js/nodes/actors/physics.js" language="javascript"></script>
+	
 	<script src="js/ui/ui.js" language="javascript"></script>
 	<script src="js/ui/viewer.js" language="javascript"></script>
-	
+	<script src="js/ui/resources.js" language="javascript"></script>
+
 	<script>
 	
 		var viewer;
 	
-		function initEventHandling() {
-			var handleMouseDown, handleMouseMove, handleMouseUp, selected_mesh = false,
-				_v3 = new THREE.Vector3(), _vector = new THREE.Vector3(),
-				camera = viewer.host3D.camera, intersections;
-						
-			var cannon = viewer.level.findNodeByName("cannon");
-			var l = viewer.level.findNodeByName("l");
-			var r = viewer.level.findNodeByName("r");
+		var pongialized = false;
+		var cube_actor, left_hand, right_hand;
+		
+		function pushLeft() {			
+			if (pongialized) {
+				cube_actor.pushZ(-25);
+			}
+		}
+		
+		function pushRight() {			
+			if (pongialized) {
+				cube_actor.pushZ(25);
+			}
+		}
+		
+		function pushUp() {			
+			if (pongialized) {
+				cube_actor.pushY(25);
+			}
+		}
+		
+		function pushDown() {			
+			if (pongialized) {
+				cube_actor.pushY(-25);
+			}
+		}
+		
+		function onKeyUp(e) {
+			var key = e.keyCode ? e.keyCode : e.charCode;
+			console.log("key:" + key);
+			switch( key ) {
+				case 32, 87: /* space, W */
+					pushUp();
+					break;
+				case 83: /* S */
+					pushDown();
+					break;
+				case 37, 65: /* left, A */
+					pushLeft();
+					break;
+				case 39, 68: /* right, D */
+					pushRight();
+					break;
+				case 27: /*ESC*/
+					viewer.loadLevelList();
+			}
+		}
+	
+		function rightHandUp() {
+			if (pongialized) {
+				right_hand.wrapper.position.y += 2;
+				right_hand.wrapper.__dirtyPosition = true;
+			}
+		}
+		
+		function rightHandDown() {
+			if (pongialized) {
+				right_hand.wrapper.position.y -= 2;
+				right_hand.wrapper.__dirtyPosition = true;
+			}
+		}
+		
+		var mouseX, mouseY;
+		
+		function onMouseMove(event) {
+			if (mouseY > event.pageY) {
+				rightHandUp();
+			} else if (mouseY < event.pageY) {
+				rightHandDown();
+			}
+			mouseX = event.pageX;
+			mouseY = event.pageY;
+		}
+		
+		function initPong() {
+			cube_actor = viewer.level.findNodeByName("cube_actor");
+			cube_actor.target.wrapper.setAngularFactor(_v(1,0,1));
+			cube_actor.target.wrapper.setLinearFactor(_v(0,1,1));
 			
-			handleMouseDown = function( evt ) {
-				_vector.set(
-					( evt.clientX / window.innerWidth ) * 2 - 1,
-					-( evt.clientY / window.innerHeight ) * 2 + 1,
-					1
-				);
-				
-				var raycaster = new THREE.Raycaster();
-				raycaster.setFromCamera( _vector, camera );
-				intersections = raycaster.intersectObjects( viewer.level.selectable );
-				
-				if ( intersections.length > 0 ) {
-					selected_mesh = intersections[0].object;					
-					
-					if (selected_mesh === cannon.wrapper) {
-						console.log("Pong!");
-						var ball = new weggeSphere();						
-						ball.json.color = _randomColorHex();
-						ball.json.scale = [1,1,1];
-						ball.json.radius = 50;
-						ball.json.mass = 2;
-						var wrapper = ball.initialize();
-						wrapper.position.copy(selected_mesh.position);						
-						wrapper.rotation.copy(selected_mesh.rotation);
-						wrapper.__dirtyPosition = true;
-						viewer.host3D.scene.add(wrapper);
-						
-						_vector.copy( selected_mesh.rotation ).multiplyScalar(2000);
-						
-						wrapper.applyCentralImpulse(_vector);						
-					} else if (selected_mesh === l.wrapper) {
-						cannon.wrapper.rotateY(0.2);
-					} else if (selected_mesh === r.wrapper) {
-						cannon.wrapper.rotateY(-0.2);
-					}
-					
-					/*
-					_vector.set( 0, 0, 0 );
-					selected_block.setAngularFactor( _vector );
-					selected_block.setAngularVelocity( _vector );
-					selected_block.setLinearFactor( _vector );
-					selected_block.setLinearVelocity( _vector );
-
-					mouse_position.copy( intersections[0].point );
-					block_offset.subVectors( selected_block.position, mouse_position );
-					
-					intersect_plane.position.z = mouse_position.z;
-					*/
-				}
-			};
+			cube_actor.target.wrapper.addEventListener( 'collision', function( other_object, relative_velocity, relative_rotation, contact_normal ) {
+				//this.setAngularVelocity(_v(0,0,0));		
+				//this.setLinearVelocity(_v(0,this.linearVelocity.y,this.linearVelocity.z));
+				//this.rotation.set(0,0,0);
+				//this.__dirtyRotation = true;				
+			});
 			
-			handleMouseMove = function( evt ) {
-				if ( selected_mesh ) {
-					
-					_vector.set(
-						( evt.clientX / window.innerWidth ) * 2 - 1,
-						-( evt.clientY / window.innerHeight ) * 2 + 1,
-						1
-					);
-					
-				}
-				
-			};
-			
-			handleMouseUp = function( evt ) {
-				
-				if ( selected_mesh) {
-					
-				}
-				
-			};
-						
-			document.addEventListener( 'mousedown', handleMouseDown );
-			document.addEventListener( 'mousemove', handleMouseMove );
-			document.addEventListener( 'mouseup', handleMouseUp );
-			
-			viewer.host3D.scene.addEventListener(
-				'update',
-				function() {
-
-					if ( selected_mesh ) {
-						
-					}	
-					
-				}
-			);
+			left_hand = viewer.level.findNodeByName("left_hand");
+			right_hand = viewer.level.findNodeByName("right_hand");
+			window.document.addEventListener( 'keyup', onKeyUp );
+			window.document.addEventListener( 'mousemove', onMouseMove );
+	
+			pongialized = true;
 		}
 		
 		$(function () {
 			viewer = new weggeViewer();
-			viewer.onLevelLoaded = initEventHandling;
-			var cookie = _readCookie("level");
-			if (cookie !== null) {
-				viewer.startLoadingLevel(cookie);
-			}
-			
+			viewer.onLevelLoaded = initPong;
+			viewer.startLoadingLevel(31);			
 		});
 		
 	</script>

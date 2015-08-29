@@ -45,13 +45,7 @@ weggeSphere.prototype.initialize = function(resources) {
 			phy_material,
 			this.json.mass
 		);
-		/*
-		this.wrapper.addEventListener( 'collision', function( other_object, relative_velocity, relative_rotation, contact_normal ) {
-			// `this` has collided with `other_object` with an impact speed of `relative_velocity` and a rotational force of `relative_rotation` and at normal `contact_normal`
-			console.log("In weggeSphere.prototype.initialize.");
-			console.log(other_object);			
-		});
-		*/
+		
 	} else {		
 		this.wrapper = new THREE.Mesh( geometry, material );
 	}
@@ -97,21 +91,19 @@ weggeBox.prototype.initialize = function(resources) {
 	if (material === null) {
 		var color = new THREE.Color();
 		color.setStyle(this.json.color);
-		material = new THREE.MeshLambertMaterial({color:color,ambient:color});
+		material = new THREE.MeshBasicMaterial({color:color});
+		if (_b(this.json.physics)) {	
+			material = Physijs.createMaterial(material, 1, 1);
+		}
 	}
 	
 	if (material !== null) {
-		if (this.json.physics > 0) {
-			var phy_material = Physijs.createMaterial(
-				material,
-				.6, // medium friction
-				.7 // low restitution
-			);		
+		if (_b(this.json.physics)) {			
 			this.wrapper = new Physijs.BoxMesh(
 				geometry,
-				phy_material,
+				material,
 				this.json.mass
-			);	
+			);			
 		} else {		
 			this.wrapper = new THREE.Mesh( geometry, material );
 		}

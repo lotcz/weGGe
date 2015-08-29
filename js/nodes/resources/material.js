@@ -7,14 +7,14 @@ function weggeMaterial() {
 	
 	this.json.type = "Material";
 	this.json.name = "--texture--";
-	this.json.material_type = "MeshLambertMaterial";	
+	this.json.material_type = "MeshBasicMaterial";	
 	this.json.color = "#D0D0D0";
+	this.json.wireframe = false;
 	this.material = false;
 }
 
 weggeMaterial.prototype.initialize = function ( onInitialized ) {	
-	if (false) {};
-	this.material = new THREE[this.json.material_type]( { color: this.json.color, side: THREE.DoubleSide } );										
+	this.material = new THREE[this.json.material_type]( { color: this.json.color, side: THREE.DoubleSide, wireframe:_b(this.json.wireframe) } );										
 	this.initialized = true;
 	onInitialized();
 }

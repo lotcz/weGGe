@@ -27,7 +27,8 @@ function weggeLevel() {
 	this.json.creator.renderingPaused = 0;
 	this.json.creator.animationPaused = 0;
 	this.json.creator.physicsPaused = 0;
-	
+	this.json.creator.formCollapsed = false;
+		
 	this.animated = [];
 	this.selectable = [];
 	this.host3D = false;

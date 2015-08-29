@@ -5,13 +5,15 @@ function weggeViewer( ) {
 	this.level = false;
 	this.resources = false;
 	this.host3D = false;
-	this.controls = false;
+	
+	this.controls = null;
+	this.controlsEnabled = true;
 	
 	this.keyboard = null;
-	this.keyboardInput = true;
+	this.keyboardEnabled = false;
 	
 	this.mouse = null;
-	this.mouseSelect = true;
+	this.mouseEnabled = false;
 	
 	this.ui = new weggeUI();
 	this.info = this.ui.addContainer().css({position:"absolute",bottom:"0px",right:"0px"}).hide();
@@ -24,7 +26,7 @@ function weggeViewer( ) {
 			this.level.initialize(this.host3D, this.resources);
 			this.host3D.onAnimationFrame = _bind(this, this.animationFrame);
 			
-			if (!this.controls) {
+			if (!this.controls && this.controlsEnabled) {
 				this.controls = new weggeControls({ "camera":this.host3D.camera, element: document });
 				this.controls.resetToDefault();
 				this.controls.movementSpeed = 500;				
@@ -32,15 +34,16 @@ function weggeViewer( ) {
 				this.controls.onControlsStateChanged = _bind(this, this.controlsStateChanged);
 			}
 			
-			this.controls.initialize( this.host3D.camera, this.level.json.cameraLatitude, this.level.json.cameraLongitude );			
-				
+			if (this.controlsEnabled) {
+				this.controls.initialize( this.host3D.camera, this.level.json.cameraLatitude, this.level.json.cameraLongitude );			
+			}
 				
 			if (this.mouse !== null) {
 				this.mouse.destroy();
 				this.mouse = null;
 			}
 			
-			if (this.mouseSelect) {				
+			if (this.mouseEnabled) {				
 				this.mouse = new weggeMouse(this.level.selectable, this.host3D.camera);
 			}
 			
@@ -49,7 +52,7 @@ function weggeViewer( ) {
 				this.keyboard = null;
 			}
 			
-			if (this.keyboardInput) {				
+			if (this.keyboardEnabled) {				
 				//this.keyboard = new weggeKeyboard(this.level.selectable, this.host3D);
 			}
 			
@@ -122,11 +125,11 @@ function weggeViewer( ) {
 		this.ui.removeOverlay();
 	}
 	
-	this.resetHost3D = function () {
-		this.controls.camera = false;
+	this.resetHost3D = function () {		
 		if (this.host3D) {
 			this.host3D.destroy();
 			this.host3D = false;
+			this.level = false;
 		}
 	}
 	
