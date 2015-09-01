@@ -24,6 +24,9 @@
 	<script src="js/tools.js" language="javascript"></script>
 	<script src="js/host3d.js" language="javascript"></script>
 	<script src="js/controls.js" language="javascript"></script>
+	<script src='lib/MTLLoader.js'></script>
+	<script src='lib/OBJMTLLoader.js'></script>
+	<script src='lib/threex.spaceships.js'></script>
 
 	<script src="js/nodes/node.js" language="javascript"></script>	
 	<script src="js/nodes/level.js" language="javascript"></script>
@@ -31,6 +34,10 @@
 	<script src="js/nodes/objects/group.js" language="javascript"></script>
 	<script src="js/nodes/objects/basic.js" language="javascript"></script>
 	<script src="js/nodes/objects/mesh.js" language="javascript"></script>
+	<script src="js/nodes/objects/plane.js" language="javascript"></script>
+	<script src="js/nodes/objects/lines.js" language="javascript"></script>
+	<script src="js/nodes/objects/spaceship.js" language="javascript"></script>
+	<script src="js/nodes/objects/dynamic.js" language="javascript"></script>
 	
 	<script src="js/nodes/resources/resources.js" language="javascript"></script>
 	<script src="js/nodes/resources/resource.js" language="javascript"></script>
@@ -55,29 +62,53 @@
 		var viewer;
 	
 		var pongialized = false;
-		var cube_actor, left_hand, right_hand;
+		var cube_actor, left_hand, right_hand, wall_up, wall_down, wall_left, wall_right;
 		
-		function pushLeft() {			
+		var blasts, cube_dynamic;
+		
+		function pushLeft(args) {			
 			if (pongialized) {
-				cube_actor.pushZ(-25);
+				cube_actor.pushZ(-_coalesce(args,250));
 			}
 		}
 		
-		function pushRight() {			
+		function pushRight(args) {			
 			if (pongialized) {
-				cube_actor.pushZ(25);
+				cube_actor.pushZ(_coalesce(args,250));
 			}
 		}
 		
-		function pushUp() {			
+		function pushUp(args) {			
 			if (pongialized) {
-				cube_actor.pushY(25);
+				cube_actor.pushY(_coalesce(args,100));
 			}
 		}
 		
-		function pushDown() {			
+		function pushDown(args) {			
 			if (pongialized) {
-				cube_actor.pushY(-25);
+				cube_actor.pushY(-_coalesce(args,100));
+			}
+		}
+		
+		function onKeyDown(e) {
+			var key = e.keyCode ? e.keyCode : e.charCode;
+			console.log("key:" + key);
+			switch( key ) {
+				case 87: /* W */
+					rightHandUp();
+					break;				
+				case 83: /* S */
+					rightHandDown();
+					break;
+				case 65: /* A */
+					//pushLeft();
+					break;
+				case 68: /* D */
+					//pushRight();
+					break;	
+				case 32: /* space */
+					shoot();
+					break;					
 			}
 		}
 		
@@ -85,34 +116,50 @@
 			var key = e.keyCode ? e.keyCode : e.charCode;
 			console.log("key:" + key);
 			switch( key ) {
-				case 32, 87: /* space, W */
-					pushUp();
-					break;
+				case 87: /* W */
+					stopRightHand()
+					break;				
 				case 83: /* S */
-					pushDown();
+					stopRightHand()
 					break;
-				case 37, 65: /* left, A */
+				case 37: /* left */
 					pushLeft();
 					break;
-				case 39, 68: /* right, D */
+				case 39: /* right */
 					pushRight();
-					break;
+					break;				
 				case 27: /*ESC*/
 					viewer.loadLevelList();
 			}
 		}
 	
+		var lh_moving = false;
+		var lh_up = false;
+
+		var rh_moving = false;		
+		var rh_up = false;
+		var rh_hasCube = false;
+		
+		var rh_shot = false;
+		var cube_vert = 0;
+		
+		function stopRightHand() {
+			if (pongialized) {
+				rh_moving = false;
+			}
+		}
+		
 		function rightHandUp() {
 			if (pongialized) {
-				right_hand.wrapper.position.y += 2;
-				right_hand.wrapper.__dirtyPosition = true;
+				rh_moving = true;
+				rh_up = true;
 			}
 		}
 		
 		function rightHandDown() {
 			if (pongialized) {
-				right_hand.wrapper.position.y -= 2;
-				right_hand.wrapper.__dirtyPosition = true;
+				rh_moving = true;
+				rh_up = false;
 			}
 		}
 		
@@ -128,24 +175,154 @@
 			mouseY = event.pageY;
 		}
 		
+		function shoot() {
+			pushLeft(350);
+			rh_hasCube = false;
+			if (rh_moving) {
+				if (rh_up) {
+					cube_vert = 1;
+					pushUp();
+				} else {
+					cube_vert = -1;
+					pushDown();
+				}
+			}			
+		}
+		
+		function restartGame() {
+			cube_actor.target.wrapper.position.copy(right_hand.wrapper.position);
+			cube_actor.target.wrapper.position.z -= 10;
+			cube_actor.target.wrapper.__dirtyPosition = true;
+			cube_actor.target.wrapper.rotation.set(0,0,0);
+			cube_actor.target.wrapper.__dirtyRotation = true;	
+			cube_actor.target.wrapper.setAngularVelocity(_v(0,0,0));
+			cube_actor.target.wrapper.setLinearVelocity(_v(0,0,0));
+			cube_vert = 0;
+			rh_hasCube = true;
+		}
+		
+		var tail_time = 0;
+		
+		function animationFrame(delta) {
+			if (rh_moving) {
+				if (rh_up) {
+					right_hand.wrapper.position.y += 10;					
+				} else {
+					right_hand.wrapper.position.y -= 10;
+				}
+				right_hand.wrapper.__dirtyPosition = true;
+				if (rh_hasCube) {
+					cube_actor.target.wrapper.position.copy(right_hand.wrapper.position);
+					cube_actor.target.wrapper.position.z -= 10;
+					cube_actor.target.wrapper.__dirtyPosition = true;
+					cube_actor.target.wrapper.setLinearVelocity(_v(0,0,0));					
+				}				
+			}
+			tail_time -= delta;
+			if (!rh_hasCube && (tail_time <= 0)) {
+				cube_dynamic.create(cube_actor.target.wrapper.position,1);
+				tail_time = 0.1;
+			}
+		}
+		
+		function cubeVertApply() {
+			if (cube_vert > 0) {
+				pushUp();
+			} else if (cube_vert < 0) {
+				pushDown();
+			}
+		}
+		
+		function cubeHit( other_object, relative_velocity, relative_rotation, contact_normal ) {
+			if (pongialized) {
+				blasts.create(cube_actor.target.wrapper.position,2.5);
+						
+				if (other_object === left_hand.wrapper) {
+					if (lh_moving) {
+						if (lh_up) {
+							cube_vert = 1;
+						} else {
+							cube_vert = -1;
+						}
+					}
+					cubeVertApply();
+					//pushRight(5);
+					rh_shot = false;
+				} else if (other_object === right_hand.wrapper) {
+					if (rh_moving) {
+						if (rh_up) {
+							cube_vert = 1;
+						} else {
+							cube_vert = -1;
+						}
+					}
+					cubeVertApply();
+					//pushLeft(5);
+					rh_shot = true;
+				} else if (other_object === wall_up.wrapper) {
+					if (rh_shot) {						
+						pushLeft();
+					} else {
+						pushRight();
+					}
+					cube_vert = -1;
+				} else if (other_object === wall_down.wrapper) {
+					if (rh_shot) {						
+						pushLeft();
+					} else {
+						pushRight();						
+					}
+					cube_vert = 1;
+				}
+			}			
+		}
+		
 		function initPong() {
 			cube_actor = viewer.level.findNodeByName("cube_actor");
-			cube_actor.target.wrapper.setAngularFactor(_v(1,0,1));
+			cube_actor.target.wrapper.setAngularFactor(_v(0,0,0));
 			cube_actor.target.wrapper.setLinearFactor(_v(0,1,1));
 			
-			cube_actor.target.wrapper.addEventListener( 'collision', function( other_object, relative_velocity, relative_rotation, contact_normal ) {
-				//this.setAngularVelocity(_v(0,0,0));		
-				//this.setLinearVelocity(_v(0,this.linearVelocity.y,this.linearVelocity.z));
-				//this.rotation.set(0,0,0);
-				//this.__dirtyRotation = true;				
+			// Enable CCD if the object moves more than 1 meter in one simulation frame
+			cube_actor.target.wrapper.setCcdMotionThreshold(10);
+
+			// Set the radius of the embedded sphere such that it is smaller than the object
+			cube_actor.target.wrapper.setCcdSweptSphereRadius(0.2);
+		
+			cube_actor.target.wrapper.addEventListener( 'collision', cubeHit);
+			
+			cube_dynamic = viewer.level.findNodeByName("cube_dynamic");
+						
+			wall_left = viewer.level.findNodeByName("wall_left");
+			wall_left.wrapper.addEventListener( 'collision', function( other_object, relative_velocity, relative_rotation, contact_normal ) {
+				restartGame();		
 			});
 			
+			wall_right = viewer.level.findNodeByName("wall_right");
+			wall_right.wrapper.addEventListener( 'collision', function( other_object, relative_velocity, relative_rotation, contact_normal ) {
+				restartGame();		
+			});
+			
+			wall_up = viewer.level.findNodeByName("wall_up");
+			wall_down = viewer.level.findNodeByName("wall_down");
+						
 			left_hand = viewer.level.findNodeByName("left_hand");
+			left_hand.wrapper.setLinearFactor(_v(0,1,0));
+			left_hand.wrapper.setAngularFactor(_v(0,0,0));
+			
 			right_hand = viewer.level.findNodeByName("right_hand");
+			right_hand.wrapper.setLinearFactor(_v(0,1,0));
+			right_hand.wrapper.setAngularFactor(_v(0,0,0));
+			
+			blasts = viewer.level.findNodeByName("dynamic_blasts");
+			
 			window.document.addEventListener( 'keyup', onKeyUp );
-			window.document.addEventListener( 'mousemove', onMouseMove );
+			window.document.addEventListener( 'keydown', onKeyDown );
+			//window.document.addEventListener( 'mousemove', onMouseMove );
 	
+			viewer.level.animated.push({animationFrame:animationFrame});
+			
 			pongialized = true;
+			restartGame();
 		}
 		
 		$(function () {

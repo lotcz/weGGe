@@ -99,7 +99,7 @@ weggeLevel.prototype.loadFromJSON = function(id, json) {
 	this.json = json;
 	if ((!this.json.name) || this.json.name.length == 0) {
 		this.json.name = "LEVEL " + this.id;
-	}
+	}	
 	this.json.cameraLatitude = _coalesce(this.json.cameraLatitude, 0);
 	this.json.cameraLongitude = _coalesce(this.json.cameraLongitude, 0);
 	this.json.cameraPosition = _coalesce(this.json.cameraPosition, [0,0,0]);

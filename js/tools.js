@@ -163,7 +163,11 @@ function _getTypeName (obj) {
 /* VECTORS */
 
 function _v(x, y, z) {
-	return _arrayToVector([x,y,z]);
+	if (_isObject(x) && x.x) {
+		return _arrayToVector([x.x,x.y,x.z]);
+	} else {
+		return _arrayToVector([x,y,z]);
+	}
 }
 
 function _applyArrayToVector( v, arr ) {

@@ -4,7 +4,7 @@
 	
 	global $db;
 		
-	$query = "SELECT level_id, left(level_json,100) as level_preview FROM levels";
+	$query = "SELECT level_id, level_name as level_preview FROM levels";
 	
 	$result = $db->query($query) or die('SQL Error - '.$query);
 		

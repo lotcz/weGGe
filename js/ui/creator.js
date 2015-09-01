@@ -104,8 +104,8 @@ function weggeCreator() {
 	/* LEVEL */
 	
 	this.levelLoaded = function( data ) { 
-		console.log("level loaded:");
-		console.log(data);
+		//console.log("level loaded:");
+		//console.log(data);
 		this.ui.showLoading("Initializing...");
 		if (data.level_id) {
 			this.level = new weggeLevel();
@@ -227,7 +227,7 @@ function weggeCreator() {
 				json.cameraPosition = [this.host3D.camera.position.x,this.host3D.camera.position.y,this.host3D.camera.position.z];
 			}
 			var jsonString = JSON.stringify(json);
-			$.post("php/saveLevel.php", { "level_id":this.level.id,"level_json":jsonString }, 
+			$.post("php/saveLevel.php", { "level_id":this.level.id,"level_name":this.level.json.name,"level_json":jsonString }, 
 				_bind(this, this.levelSaved)
 			);
 		} else {

@@ -40,4 +40,11 @@ weggePhysicsActor.prototype.pushZ = function(args) {
 	}
 }
 
+weggePhysicsActor.prototype.stopMovement = function(args) {
+	if (this.target !== null && this.target.wrapper) {	
+		this.target.wrapper.setLinearVelocity(_v(0,0,0));
+		this.target.wrapper.setAngularVelocity(_v(0,0,0));
+	}
+}
+				
 weggeNode.prototype.availableTypes.push("PhysicsActor");

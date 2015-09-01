@@ -137,7 +137,7 @@ function weggeHost3D() {
 	this.animationFrame = function() {	
 		if (!this.renderingPaused) {
 			if (this.stats) this.stats.begin();	
-			requestAnimationFrame(_bind(this, this.animationFrame));	
+			requestAnimationFrame(this.animationFrameClosure);	
 			this.delta = this.clock.getDelta();
 			if (this.physicsEnabled && !this.physicsPaused) {
 				this.updatePhysics(this.delta);
@@ -150,6 +150,8 @@ function weggeHost3D() {
 		}
 	}
 	
+	this.animationFrameClosure = _bind(this, this.animationFrame);
+		
 	this.onWindowResize = function () {
 		this.width = window.innerWidth;
 		this.height = window.innerHeight - 5;
