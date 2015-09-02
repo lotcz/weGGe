@@ -11,4 +11,8 @@ weggeResource.prototype.initialize = function ( onInit ) {
 	onInit();
 }
 
+weggeResource.prototype.renderPreview = function ( ) {
+	return false;
+}
+
 weggeResource.prototype.availableTypes = [];

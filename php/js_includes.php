@@ -1,14 +1,7 @@
-<!doctype html>
-<html>
-	<head>
-		<meta charset="utf-8" />
-		<link href="ui.css" rel="stylesheet"/>
-		<link href="favicon.ico" rel="icon"/>
-		<title>weGGe</title>
-	</head>
-	
-	<body></body>
+<?php 
 
+?>
+	<script src="lib/jquery.min.js" language="javascript"></script>
 	<script src="lib/three.js" language="javascript"></script>	
 	<script src='lib/threex.volumetricspotlightmaterial.js'></script>
 	<script src='lib/threex.volumetricspotlightmesh.js'></script>
@@ -26,7 +19,6 @@
 	</script>
 	
 	<script src="lib/stats.min.js" language="javascript"></script>
-	<script src="lib/jquery.min.js" language="javascript"></script>
 	<script src="lib/helvetiker_regular.typeface.js" language="javascript"></script>
 	<script src="lib/transformControls.js" language="javascript"></script>
 	
@@ -37,7 +29,6 @@
 	
 	<script src="js/nodes/node.js" language="javascript"></script>	
 	<script src="js/nodes/objects/object.js" language="javascript"></script>	
-	<script src="js/nodes/level.js" language="javascript"></script>
 	<script src="js/nodes/objects/group.js" language="javascript"></script>
 	<script src="js/nodes/objects/axis.js" language="javascript"></script>	
 	<script src="js/nodes/objects/plane.js" language="javascript"></script>
@@ -56,6 +47,7 @@
 	<script src="js/nodes/resources/phy_material.js" language="javascript"></script>	
 	<script src="js/nodes/resources/texture.js" language="javascript"></script>
 	<script src="js/nodes/resources/model.js" language="javascript"></script>
+	<script src="js/nodes/resources/sound.js" language="javascript"></script>
 	
 	<script src="js/nodes/actors/actor.js" language="javascript"></script>
 	<script src="js/nodes/actors/clickable.js" language="javascript"></script>
@@ -63,19 +55,11 @@
 	<script src="js/nodes/actors/turning.js" language="javascript"></script>
 	<script src="js/nodes/actors/spawn.js" language="javascript"></script>
 	<script src="js/nodes/actors/physics.js" language="javascript"></script>
+	<script src="js/nodes/actors/audio.js" language="javascript"></script>
+	
+	<script src="js/nodes/levels/level.js" language="javascript"></script>
+	<script src="js/nodes/levels/pong.js" language="javascript"></script>
 	
 	<script src="js/ui/ui.js" language="javascript"></script>
 	<script src="js/ui/viewer.js" language="javascript"></script>
 	<script src="js/ui/resources.js" language="javascript"></script>
-	<script src="js/ui/creator.js" language="javascript"></script>
-	
-	<script>
-	
-		$(function () {
-			var creator = new weggeCreator();
-			//creator.startLoadingLevel(1);
-		});
-		
-	</script>
-	
-</html>

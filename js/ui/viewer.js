@@ -146,7 +146,7 @@ function weggeViewer( ) {
 		this.ui.showLoading("Initializing...");
 		if (data.level_id) {
 			_createCookie("level",data.level_id);
-			this.level = new weggeLevel();
+			this.level = new window["wegge" + data.level_json.type]();
 			this.level.loadFromJSON(data.level_id, data.level_json);
 			var res = this.level.getRequiredResources();
 			if (res.length > 0) {

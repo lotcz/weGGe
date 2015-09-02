@@ -157,6 +157,7 @@ weggeLevel.prototype.initialize = function ( host3D, resources ) {
 	this.applyJSON();
 	this.buildAnimatedArray();
 	this.buildSelectableArray();
-	this.initializeActors(this);
+	this.resources = resources;
+	this.initializeActors(this);	
 	this.initialized = true;
 }

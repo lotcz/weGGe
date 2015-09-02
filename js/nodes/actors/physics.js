@@ -10,14 +10,6 @@ function weggePhysicsActor() {
 	this.json.push_amount = 5;
 }
 
-/*
-_vector.set( 0, 0, 0 );
-selected_block.setAngularFactor( _vector );
-selected_block.setAngularVelocity( _vector );
-selected_block.setLinearFactor( _vector );
-selected_block.setLinearVelocity( _vector );
-*/
-		
 weggePhysicsActor.prototype.applyCentralImpulse = function(v) {
 	this.target.wrapper.applyCentralImpulse(v);
 }
@@ -39,11 +31,12 @@ weggePhysicsActor.prototype.pushZ = function(args) {
 		this.applyCentralImpulse( _v(0,0,parseFloat(args,this.json.push_amount,10)) );
 	}
 }
+weggePhysicsActor.prototype.zeroV = _v(0,0,0);
 
 weggePhysicsActor.prototype.stopMovement = function(args) {
 	if (this.target !== null && this.target.wrapper) {	
-		this.target.wrapper.setLinearVelocity(_v(0,0,0));
-		this.target.wrapper.setAngularVelocity(_v(0,0,0));
+		this.target.wrapper.setLinearVelocity(this.zeroV);
+		this.target.wrapper.setAngularVelocity(this.zeroV);		
 	}
 }
 				

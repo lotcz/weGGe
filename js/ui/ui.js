@@ -148,4 +148,5 @@ function weggeUI( element ) {
 	window.addEventListener( 'resize', _bind( this, this.onWindowResize) , false );	
 	this.onWindowResize();
 	*/
+		
 }
