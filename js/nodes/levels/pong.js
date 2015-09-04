@@ -32,7 +32,7 @@ weggePongLevel.prototype.gameOver = function() {
 }
 
 weggePongLevel.prototype.cubeSpeedAccelerated = function() {				
-	this.tail_speed += 25;
+	this.tail_speed = 35;
 	if (this.tail_time > (1/this.tail_speed)) {
 		this.tail_time = 0; //create dynamic cube now
 	}
@@ -40,22 +40,22 @@ weggePongLevel.prototype.cubeSpeedAccelerated = function() {
 
 weggePongLevel.prototype.pushLeft = function(args) {			
 	this.cube_actor.pushZ(-_coalesce(args,250));
-	this.cubeSpeedAccelerated();
+	//this.cubeSpeedAccelerated();
 }
 
 weggePongLevel.prototype.pushRight = function(args) {			
 	this.cube_actor.pushZ(_coalesce(args,250));
-	this.cubeSpeedAccelerated();
+	//this.cubeSpeedAccelerated();
 }
 
 weggePongLevel.prototype.pushUp = function(args) {			
 	this.cube_actor.pushY(_coalesce(args,150));
-	this.cubeSpeedAccelerated();
+	//this.cubeSpeedAccelerated();
 }
 
 weggePongLevel.prototype.pushDown = function(args) {			
 	this.cube_actor.pushY(-_coalesce(args,150));
-	this.cubeSpeedAccelerated();
+	//this.cubeSpeedAccelerated();
 }
 
 weggePongLevel.prototype.onKeyDown = function(e) {
@@ -135,7 +135,6 @@ weggePongLevel.prototype.shoot = function() {
 			this.cube_vert = -1;
 			this.pushDown();
 		}
-		this.tail_speed = 20;
 	}			
 }
 
@@ -163,18 +162,17 @@ weggePongLevel.prototype.animationFrame = function(delta) {
 	if (!this.rh_hasCube && (this.tail_speed > 3) && (this.tail_time <= 0)) {
 		this.cube_dynamic.create(this.cube_actor.target.wrapper.position,1);
 		this.tail_time = 1/this.tail_speed;
-		this.tail_speed -= (this.tail_speed*0.15);
+		this.tail_speed -= (this.tail_speed*0.2);
 	}
+}
+weggePongLevel.prototype.cubeBlast = function() {
+	this.blasts.create(this.cube_actor.target.wrapper.position,2.5);
 }
 
 weggePongLevel.prototype.cubeHit = function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 	
 	if (this.initialized) {
 		
-		if (!this.rh_hasCube) {
-			this.blasts.create(this.cube_actor.target.wrapper.position,2.5);						
-		}
-				
 		if (other_object === this.left_hand.wrapper) {
 			if (this.lh_moving) {
 				if (this.lh_up) {
@@ -197,7 +195,9 @@ weggePongLevel.prototype.cubeHit = function( other_object, relative_velocity, re
 					this.pushDown(250);
 				}
 			}
-			this.pop_audio.play();
+			if (!this.rh_hasCube) {
+				this.pop_audio.play();
+			}
 			this.rh_shot = true;
 		} else if (other_object === this.wall_up.wrapper) {
 			if (this.rh_shot) {						
@@ -205,7 +205,9 @@ weggePongLevel.prototype.cubeHit = function( other_object, relative_velocity, re
 			} else {
 				this.pushRight();
 			}
-			this.pop_audio.play();
+			//this.pop_audio.play();
+			this.cubeSpeedAccelerated();
+			this.cubeBlast();
 			this.cube_vert = -1;
 		} else if (other_object === this.wall_down.wrapper) {
 			if (this.rh_shot) {						
@@ -213,7 +215,9 @@ weggePongLevel.prototype.cubeHit = function( other_object, relative_velocity, re
 			} else {
 				this.pushRight();						
 			}
-			this.pop_audio.play();
+			//this.pop_audio.play();
+			this.cubeSpeedAccelerated();
+			this.cubeBlast();
 			this.cube_vert = 1;
 		}
 	}			

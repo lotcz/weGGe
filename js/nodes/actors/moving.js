@@ -28,3 +28,32 @@ weggeMovingActor.prototype.moveBackward = function(args) {
 }
 
 weggeNode.prototype.availableTypes.push("MovingActor");
+
+weggeFollowActor.prototype = new weggeActor();
+weggeFollowActor.prototype.constructor = weggeFollowActor; 
+
+function weggeFollowActor() {
+	this.base = weggeActor;
+	this.base();	
+	
+	this.json.type = "FollowActor";
+	this.json.name = "--Follow actor--";	
+	this.json.follower_name = "follower_id";	
+}
+
+weggeFollowActor.prototype.initActor = function(level) {
+	if (this.json.target_name.length > 0) {
+		this.target = level.findNodeByName(this.json.target_name);
+	}
+	if (this.json.follower_name.length > 0) {
+		this.follower = level.findNodeByName(this.json.follower_name);
+	}	
+}
+
+weggeFollowActor.prototype.animationFrame = function(delta) {
+	if (this.enabled) {
+		this.follower.wrapper.position.copy(this.target.wrapper.position);
+	}
+}
+
+weggeNode.prototype.availableTypes.push("FollowActor");

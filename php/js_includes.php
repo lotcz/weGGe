@@ -40,6 +40,7 @@
 	<script src="js/nodes/objects/skybox.js" language="javascript"></script>
 	<script src="js/nodes/objects/lines.js" language="javascript"></script>
 	<script src="js/nodes/objects/dynamic.js" language="javascript"></script>
+	<script src="js/nodes/objects/sprites.js" language="javascript"></script>
 	
 	<script src="js/nodes/resources/resources.js" language="javascript"></script>
 	<script src="js/nodes/resources/resource.js" language="javascript"></script>
@@ -56,6 +57,7 @@
 	<script src="js/nodes/actors/spawn.js" language="javascript"></script>
 	<script src="js/nodes/actors/physics.js" language="javascript"></script>
 	<script src="js/nodes/actors/audio.js" language="javascript"></script>
+	<script src="js/nodes/actors/cruising.js" language="javascript"></script>
 	
 	<script src="js/nodes/levels/level.js" language="javascript"></script>
 	<script src="js/nodes/levels/pong.js" language="javascript"></script>

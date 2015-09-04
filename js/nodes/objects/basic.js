@@ -267,3 +267,74 @@ weggeText3D.prototype.initialize = function() {
 
 weggeNode.prototype.availableTypes.push("Text3D");
 
+weggeTube.prototype = new weggeObject();
+weggeTube.prototype.constructor = weggeTube; 
+
+function weggeTube() {
+	this.base = weggeObject;
+	this.base();
+	
+	this.json.name = "tube_spiral";
+	this.json.type = "Tube";
+	this.json.color = "#FF5050";
+	this.json.material_resource_id = "basic_material";
+	this.json.segments = 20; 
+	this.json.radius = 2;
+	this.json.radiusSegments = 8;
+	this.json.closed = false;	
+}
+
+var CustomSinCurve = THREE.Curve.create(
+	function ( scale ) { //custom curve constructor
+		this.scale = (scale === undefined) ? 1 : scale;
+	},
+	
+	function ( t ) { //getPoint: t is between 0-1
+		var tx = t * 100,
+			ty = Math.sin( 100 * ( Math.PI * t) ),
+			tz = Math.sin( (100 * ( Math.PI * t)) - (Math.PI/2) );
+		
+		return new THREE.Vector3(tx, ty, tz).multiplyScalar(this.scale);
+	}
+);
+
+weggeTube.prototype.initialize = function(resources) {
+		
+	var material = null;
+	
+	if (resources) {
+		var res = resources.getById( this.json.material_resource_id );
+		if (res && res.material) {
+			material = res.material;
+		} else {
+			console.log("Material not found:" + this.json.material_resource_id );
+		}
+	}
+	
+	if (material === null) {
+		var color = new THREE.Color();
+		color.setStyle(this.json.color);
+		material = new THREE.MeshBasicMaterial({color:color});		
+	}
+	
+	var curve = new CustomSinCurve( 10 );
+	
+	var geometry = new THREE.TubeGeometry(
+		curve,  //path
+		parseInt(this.json.segments),
+		parseFloat(this.json.radius),
+		parseInt(this.json.radiusSegments),
+		_b(this.json.closed)
+	);
+
+	this.wrapper = new THREE.Mesh( geometry, material );
+	
+	this.applyBasic();
+	return this.wrapper;
+}
+
+weggeTube.prototype.getRequiredResources = function() {
+	return [this.json.material_resource_id];
+}
+
+weggeNode.prototype.availableTypes.push("Tube");

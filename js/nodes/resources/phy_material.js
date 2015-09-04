@@ -40,7 +40,7 @@ weggeInvisiblePhysicsMaterial.prototype.initialize = function ( onInitialized ) 
 	if (WEGGE_CREATOR_MODE) {
 		material = new THREE[this.json.material_type]( { color: this.json.color, side: THREE.DoubleSide,wireframe:_b(this.json.wireframe) } );		
 	} else {
-		material = new THREE[this.json.material_type]( { wireframe:false,opacity:0,transparent:true } );		
+		material = new THREE[this.json.material_type]( { depthWrite:false,wireframe:false,opacity:0,transparent:true } );		
 	}
 	this.material = Physijs.createMaterial(	material, parseFloat(this.json.friction), parseFloat(this.json.bounciness));	
 	this.initialized = true;
