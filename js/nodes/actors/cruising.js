@@ -7,7 +7,7 @@ function weggeCruisingActor() {
 	
 	this.json.type = "CruisingActor";
 	this.json.name = "cruising_actor";	
-	this.json.default_speed = 10;
+	this.json.default_speed = 500;
 	this.json.enabled = true;
 	
 	this.initialized = false;	
@@ -45,7 +45,7 @@ weggeCruisingActor.prototype.findNextTarget = function( ) {
 			this.setCruisingTarget(this.next_target);
 		} else {
 			this.distance_left = this.mesh.position.distanceTo(this.next_target.vector);
-			this.step = this.next_target.initStep( this.mesh.position );
+			this.step = this.next_target.initStep( this.mesh.position, this.json.default_speed );
 			this.distance_last_check = 0;	
 			this.mesh.lookAt( this.next_target.vector );
 		}
@@ -89,16 +89,16 @@ function weggeCruisingTarget() {
 	
 	this.json.type = "CruisingTarget";
 	this.json.name = "cruising_target";	
-	this.json.speed = 100;	
+	this.json.speed = "";	
 	this.json.chain = 1;	
 	this.json.close_circle = 0;	
 	this.neighbours = new Array();
 }
 
-weggeCruisingTarget.prototype.initStep = function( position ) {
+weggeCruisingTarget.prototype.initStep = function( position, defaultSpeed ) {
 	var step = new THREE.Vector3();
 	step.subVectors( this.vector, position );
-	step.setLength( parseFloat(this.json.speed) );
+	step.setLength( parseFloat(_coalesce(_nul(this.json.speed),defaultSpeed)) );
 	return step;
 }
 
@@ -114,26 +114,5 @@ weggeCruisingTarget.prototype.initialize = function ( resources ) {
 	this.vector = _arrayToVector(this.json.position);
 	return wrapper;
 }
-
-weggeCruisingTarget.prototype.addToScene = function( n, scene ) {
-	this.coordSprite = makeTextSprite( " " + this.vector.x + "," + this.vector.z + " ", 
-		{ fontsize: 20, fontColor: {r:200, g:200, b:0, a:0.8},  borderColor: {r:200, g:200, b:0, a:1}, backgroundColor: {r:40, g:40, b:0, a:0.5} } );
-	this.coordSprite.position.copy ( this.vector ); 
-	this.coordSprite.position.y += 100;	
-	
-	this.nameSprite = makeTextSprite( " TiNG " + n + " ", { fontsize: 52, borderColor: {r:200, g:200, b:255, a:1}, backgroundColor: {r:20, g:20, b:30, a:0.5} } );
-	this.nameSprite.position.copy ( this.vector );
-	this.nameSprite.position.y += 300;
-	
-	var ch = (n % 2 == 0) ? " ~ " : " x ";
-	this.arrowSprite = makeTextSprite( ch , 
-		{ fontsize: 80, fontface:"Webdings", fontColor: {r:200, g:200, b:0, a:0.8},  borderColor: {r:200, g:200, b:0, a:1}, backgroundColor: {r:40, g:40, b:0, a:0.5} } );
-	this.arrowSprite.position.copy ( this.vector ); 
-	this.arrowSprite.position.y += 700;	
-	
-	scene.add( this.nameSprite );
-	scene.add( this.coordSprite );		
-	scene.add( this.arrowSprite );		
-}	
 
 weggeNode.prototype.availableTypes.push("CruisingTarget");

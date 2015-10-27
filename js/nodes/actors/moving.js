@@ -47,11 +47,12 @@ weggeFollowActor.prototype.initActor = function(level) {
 	}
 	if (this.json.follower_name.length > 0) {
 		this.follower = level.findNodeByName(this.json.follower_name);
-	}	
+	}
+	this.json.enabled = _b(this.json.enabled && this.target && this.follower);
 }
 
 weggeFollowActor.prototype.animationFrame = function(delta) {
-	if (this.enabled) {
+	if (this.json.enabled) {
 		this.follower.wrapper.position.copy(this.target.wrapper.position);
 	}
 }

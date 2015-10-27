@@ -7,6 +7,14 @@ function _coalesce( value1, value2 ) {
 }
 
 /*
+	return null if empty string
+*/
+function _nul( s ) {
+	return s == "" ? null : s;
+}
+
+
+/*
 	Return HTML element by id.
 */
 function _getById(id) {
@@ -83,7 +91,7 @@ function _round( num, digits ) {
 }
 
 function _b( b ) {
-	return (b !== null) && (b != "0") && (b != "false") && b;
+	return ( (b !== null) && (b != "0") && (b != "false") && b ) ? true : false;	
 }
 
 function _boolToInt(b) {

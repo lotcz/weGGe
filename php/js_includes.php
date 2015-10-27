@@ -25,7 +25,6 @@
 	<script src="js/tools.js" language="javascript"></script>
 	<script src="js/host3d.js" language="javascript"></script>
 	<script src="js/controls.js" language="javascript"></script>
-	<script src="js/textSprites.js" language="javascript"></script>
 	
 	<script src="js/nodes/node.js" language="javascript"></script>	
 	<script src="js/nodes/objects/object.js" language="javascript"></script>	
