@@ -1,8 +1,8 @@
 <?php
 
-	$db = mysqli_connect("uvdb3.active24.cz","zavadilwegge","rHPQ61zlOP","zavadilwegge") or die("Error " . mysqli_error($link)); 
+	// p: is for persistent db connection
+	$db = mysqli_connect("p:localhost","login","password","dbname") or die("Error " . mysqli_error($link)); 
 
-	
 	function _redirect($page) {
 		$host  = $_SERVER['HTTP_HOST'];
 		$uri  = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
