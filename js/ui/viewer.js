@@ -20,7 +20,6 @@ function weggeViewer( ) {
 	
 	this.start = function() {
 		if (this.level) {			
-			this.resetHost3D();
 			this.ui.showLoading("Starting...");
 			this.host3D = new weggeHost3D();
 			this.level.initialize(this.host3D, this.resources);
@@ -161,7 +160,7 @@ function weggeViewer( ) {
 	
 	this.startLoadingLevel = function( level_id ) {		
 		this.ui.showLoading("Loading...");
-		//this.resetHost3D();		
+		this.resetHost3D();		
 		this.resources = false;
 		$.get("php/loadLevel.php",
 			{level_id: level_id},

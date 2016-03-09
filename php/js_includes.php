@@ -20,7 +20,7 @@
 	
 	<script src="lib/stats.min.js" language="javascript"></script>
 	<script src="lib/helvetiker_regular.typeface.js" language="javascript"></script>
-	<script src="lib/transformControls.js" language="javascript"></script>
+	<script src="lib/TransformControls.js" language="javascript"></script>
 	
 	<script src="js/tools.js" language="javascript"></script>
 	<script src="js/host3d.js" language="javascript"></script>
