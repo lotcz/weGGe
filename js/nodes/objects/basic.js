@@ -31,7 +31,7 @@ weggeSphere.prototype.initialize = function(resources) {
 	}
 	
 	if (material === null) {
-		material = new THREE.MeshPhongMaterial({color:color,ambient:color});
+		material = new THREE.MeshPhongMaterial({color:color});
 	}
 	
 	if (this.json.physics > 0) {
@@ -46,7 +46,7 @@ weggeSphere.prototype.initialize = function(resources) {
 			this.json.mass
 		);
 		
-	} else {		
+	} else {
 		this.wrapper = new THREE.Mesh( geometry, material );
 	}
 	this.applyBasic();
@@ -238,13 +238,13 @@ function weggeText3D() {
 	this.base = weggeObject;
 	this.base();
 	
-	this.json.name = "--text 3D--";
+	this.json.name = "text";
 	this.json.type = "Text3D";
 	this.json.text = "T.E.X.T";
 	this.json.size = 100; // Float. Size of the text.
 	this.json.height = 50; // Float. Thickness to extrude text. Default is 50.
 	this.json.curveSegments = 10; // Integer. Number of points on the curves.
-	this.json.font = "helvetiker"; // String. Font name. Convertor: http://gero3.github.io/facetype.js/
+	this.json.font = "helvetiker"; // Font resource name. Convertor: http://gero3.github.io/facetype.js/
 	this.json.weight = "normal"; // String. Font weight (normal, bold).
 	this.json.style = "normal"; // String. Font style (normal, italics).
 	this.json.bevelEnabled = false; // Boolean. Turn on bevel. Default is False.
@@ -254,43 +254,59 @@ function weggeText3D() {
 	this.json.color = "#FF5050";
 }
 
-weggeText3D.prototype.initialize = function() {
-	try {
-		var geometry = new THREE.TextGeometry( this.json.text, 
-			{ 
-				size: this.json.size, 
-				height: this.json.height,
-				curveSegments: this.json.curveSegments, 
-				font: this.json.font,
-				bevelThickness: parseInt(this.json.bevelThickness),
-				bevelSize: parseInt(this.json.bevelSize),
-				bevelEnabled: _b(this.json.bevelEnabled),
-			} 
-		);
-		
-		var color = new THREE.Color();
-		color.setStyle(this.json.color);		
-		var material = new THREE.MeshPhongMaterial({color:color, ambient:color});
-		
-		if (this.json.physics > 0) {
-			var phy_material = Physijs.createMaterial(
-				material,
-				.6, // medium friction
-				.1 // low restitution
-			);		
-			this.wrapper = new Physijs.ConvexMesh(
-				geometry,
-				phy_material,
-				this.json.mass
-			);	
+weggeText3D.prototype.initialize = function(resources) {
+	var font = false;
+	
+	if (resources) {
+		var res = resources.getById( this.json.font );
+		if (res && res.font) {
+			font = res.font;
 		} else {
-			this.wrapper = new THREE.Mesh( geometry, material);
+			console.log("Font not found:" + this.json.font );
 		}
-		
-		this.applyBasic();
-		return this.wrapper;
-	} catch (e) {		
-		console.log(e);
+	}
+	
+	if (font) {	
+		try {
+			var geometry = new THREE.TextGeometry( this.json.text, 
+				{ 
+					size: this.json.size, 
+					height: this.json.height,
+					curveSegments: this.json.curveSegments, 
+					font: font,
+					bevelThickness: parseInt(this.json.bevelThickness),
+					bevelSize: parseInt(this.json.bevelSize),
+					bevelEnabled: _b(this.json.bevelEnabled),
+				} 
+			);
+			
+			var color = new THREE.Color();
+			color.setStyle(this.json.color);		
+			var material = new THREE.MeshPhongMaterial({color:color});
+			
+			if (this.json.physics > 0) {
+				var phy_material = Physijs.createMaterial(
+					material,
+					.6, // medium friction
+					.1 // low restitution
+				);		
+				this.wrapper = new Physijs.ConvexMesh(
+					geometry,
+					phy_material,
+					this.json.mass
+				);	
+			} else {
+				this.wrapper = new THREE.Mesh( geometry, material);
+			}
+			
+			this.wrapper.castShadow = true;
+			this.wrapper.receiveShadow = true;
+					
+			this.applyBasic();
+			return this.wrapper;
+		} catch (e) {		
+			console.log(e);
+		}
 	}
 }
 

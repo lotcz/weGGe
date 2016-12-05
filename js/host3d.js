@@ -2,6 +2,8 @@ function weggeHost3D() {
 	this.container = $("<div></div>").css({display:"block", position: "absolute", left: 0, top: 0, width:"100%", height:"100%"}).appendTo(document.body);
 	this.renderer = new THREE.WebGLRenderer();
 	this.renderer.setClearColor( 0x101010 );
+	this.renderer.shadowMap.enabled = true;
+	this.renderer.shadowMap.type = THREE.BasicShadowMap;
 	this.container.append(this.renderer.domElement);
 	this.clock = new THREE.Clock(true);
 	this.renderingPaused = true;	

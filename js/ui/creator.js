@@ -534,7 +534,8 @@ function weggeCreator() {
 		if (this.transformControls) {
 			this.host3D.scene.remove(this.transformControls);
 			this.transformControls.removeEventListener( 'change', this.onTransformControlsChangeCallback );
-			this.transformControls.destroy();			
+			this.transformControls.detach();			
+			this.transformControls.dispose();			
 			this.transformControls = false;
 		}		
 	}
@@ -548,7 +549,7 @@ function weggeCreator() {
 			this.transformControls = new THREE.TransformControls( this.host3D.camera, this.ui.element[0] /*this.host3D.renderer.domElement*/ );
 			this.transformControls.addEventListener( 'change', this.onTransformControlsChangeCallback);
 			this.transformControls.attach( node.wrapper );
-			this.transformControls.setSnap( 1 );
+			//this.transformControls.setSnap( 1 );
 			this.host3D.scene.add( this.transformControls );		
 			this.showInfo("\"T\" translate | \"Y\",\"Z\" rotate | \"U\" scale | \"+\" increase size | \"-\" decrease size, \"I\" world/local space");
 		}

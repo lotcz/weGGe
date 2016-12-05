@@ -17,7 +17,10 @@ weggeTexture.prototype.initialize = function ( onInitialized ) {
 	this.json.color = _coalesce(this.json.color, "#FFFFFF");
 	
 	(function (_this) {
-		THREE.ImageUtils.loadTexture( _this.json.path , undefined, 
+		var loader = new THREE.TextureLoader();
+		
+		loader.load( 
+			_this.json.path, 
 			function ( texture ) {
 				if (texture && texture.image) {
 				if (parseInt(_this.json.repeatS) > 0 || parseInt(_this.json.repeatT) > 0) {
@@ -41,11 +44,12 @@ weggeTexture.prototype.initialize = function ( onInitialized ) {
 				_this.initialized = true;
 				onInitialized();
 			},
-			 function ( data ) {
+			undefined,
+			function ( data ) {
 				console.log("Cannot load texture " + _this.json.path);
 				console.log(data);
 				_this.initialized = true;
-				onInitialized()
+				onInitialized();
 			}
 		);
 	})(this);	

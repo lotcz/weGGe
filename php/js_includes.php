@@ -7,8 +7,8 @@
 	<script src='lib/threex.volumetricspotlightmesh.js'></script>
 	<script src='lib/threex.spaceships.js'></script>
 	<script src='lib/threex.grass.js'></script>
-	<script src='lib/MTLLoader.js'></script>
-	<script src='lib/OBJMTLLoader.js'></script>
+	<!--script src='lib/MTLLoader.js'></script>
+	<script src='lib/OBJMTLLoader.js'></script-->
 
 	<script src="lib/physi.js" language="javascript"></script>	
 	<script>
@@ -19,8 +19,8 @@
 	</script>
 	
 	<script src="lib/stats.min.js" language="javascript"></script>
-	<script src="lib/helvetiker_regular.typeface.js" language="javascript"></script>
-	<script src="lib/coolvetica.font.js" language="javascript"></script>
+	<!--script src="lib/helvetiker_regular.typeface.js" language="javascript"></script>
+	<script src="lib/coolvetica.font.js" language="javascript"></script-->
 	<script src="lib/TransformControls.js" language="javascript"></script>
 	
 	<script src="js/tools.js" language="javascript"></script>
@@ -44,6 +44,7 @@
 	
 	<script src="js/nodes/resources/resources.js" language="javascript"></script>
 	<script src="js/nodes/resources/resource.js" language="javascript"></script>
+	<script src="js/nodes/resources/font.js" language="javascript"></script>
 	<script src="js/nodes/resources/material.js" language="javascript"></script>
 	<script src="js/nodes/resources/phy_material.js" language="javascript"></script>	
 	<script src="js/nodes/resources/texture.js" language="javascript"></script>

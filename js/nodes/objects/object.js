@@ -64,7 +64,11 @@ weggeObject.prototype.initialize = function ( resources ) {
 	this.initializeChildren(this.resources);	
 	this.initialized = true;
 	this.applyJSON();
-	return this.wrapper;
+	if (this.wrapper) {
+		return this.wrapper;
+	} else {
+		return [];
+	}
 }
 
 weggeObject.prototype.removeFromScene = function() {

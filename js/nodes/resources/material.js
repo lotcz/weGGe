@@ -49,7 +49,6 @@ weggeInvisibleMaterial.prototype.initialize = function ( onInitialized ) {
 
 weggeInvisibleMaterial.prototype.renderPreview = function ( ) {
 	return false;
-}	
+}
 
 weggeResource.prototype.availableTypes.push("InvisibleMaterial");
-	
