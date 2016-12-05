@@ -20,6 +20,7 @@
 	
 	<script src="lib/stats.min.js" language="javascript"></script>
 	<script src="lib/helvetiker_regular.typeface.js" language="javascript"></script>
+	<script src="lib/coolvetica.font.js" language="javascript"></script>
 	<script src="lib/TransformControls.js" language="javascript"></script>
 	
 	<script src="js/tools.js" language="javascript"></script>
@@ -50,6 +51,7 @@
 	<script src="js/nodes/resources/sound.js" language="javascript"></script>
 	
 	<script src="js/nodes/actors/actor.js" language="javascript"></script>
+	<script src="js/nodes/actors/mouse.js" language="javascript"></script>
 	<script src="js/nodes/actors/clickable.js" language="javascript"></script>
 	<script src="js/nodes/actors/moving.js" language="javascript"></script>
 	<script src="js/nodes/actors/turning.js" language="javascript"></script>

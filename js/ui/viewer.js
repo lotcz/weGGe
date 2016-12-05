@@ -13,7 +13,7 @@ function weggeViewer( ) {
 	this.keyboardEnabled = false;
 	
 	this.mouse = null;
-	this.mouseEnabled = false;
+	this.mouseEnabled = true;
 	
 	this.ui = new weggeUI();
 	this.info = this.ui.addContainer().css({position:"absolute",bottom:"0px",right:"0px"}).hide();
@@ -52,7 +52,7 @@ function weggeViewer( ) {
 			}
 			
 			if (this.keyboardEnabled) {				
-				//this.keyboard = new weggeKeyboard(this.level.selectable, this.host3D);
+				this.keyboard = new weggeKeyboard(this.level.selectable, this.host3D);
 			}
 			
 			/* start */

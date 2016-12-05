@@ -40,6 +40,8 @@ weggeModel.prototype.initialize = function ( onInitialized ) {
 				}
 			);
 		} catch (e) {
+			_this.initialized = true;
+			onInitialized();
 			console.log(e);
 		}
 	})(this);	

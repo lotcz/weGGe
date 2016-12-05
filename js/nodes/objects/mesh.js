@@ -24,7 +24,7 @@ weggeMesh.prototype.applyJSON = function(resources) {
 					res.material,
 					.6, // friction
 					.7 // bounciness
-				);		
+				);
 				this.wrapper = new Physijs.CapsuleMesh(res.geometry, phy_material, this.json.mass );
 			} else {
 				this.wrapper = new THREE.Mesh( res.geometry, res.material );	

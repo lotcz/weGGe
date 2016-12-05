@@ -74,5 +74,4 @@ weggeObject.prototype.removeFromScene = function() {
 	}
 }
 
-
 weggeNode.prototype.availableTypes.push("Object");

@@ -8,6 +8,7 @@ function weggeCruisingActor() {
 	this.json.type = "CruisingActor";
 	this.json.name = "cruising_actor";	
 	this.json.default_speed = 500;
+	this.json.turnTarget = false;
 	this.json.enabled = true;
 	
 	this.initialized = false;	
@@ -38,6 +39,13 @@ weggeCruisingActor.prototype.initActor = function(level) {
 	}
 }
 
+weggeCruisingActor.prototype.restart = function( ) {
+	if (this.children.length > 0) {
+		this.setCruisingTarget(this.children[0]);
+		this.json.enabled = true;
+	}	
+}
+
 weggeCruisingActor.prototype.findNextTarget = function( ) {		
 	this.next_target = this.next_target.neighbours[ Math.floor( Math.random() * (this.next_target.neighbours.length) ) ];
 	if (this.next_target) {		
@@ -47,7 +55,9 @@ weggeCruisingActor.prototype.findNextTarget = function( ) {
 			this.distance_left = this.mesh.position.distanceTo(this.next_target.vector);
 			this.step = this.next_target.initStep( this.mesh.position, this.json.default_speed );
 			this.distance_last_check = 0;	
-			this.mesh.lookAt( this.next_target.vector );
+			if (this.json.turnTarget) {
+				this.mesh.lookAt( this.next_target.vector );
+			}
 		}
 	} else {
 		this.json.enabled = false;
@@ -55,7 +65,7 @@ weggeCruisingActor.prototype.findNextTarget = function( ) {
 }
 
 weggeCruisingActor.prototype.setCruisingTarget = function( target ) {
-	if (this.mesh) {
+	if (this.mesh && target.vector) {
 		this.mesh.position.copy( target.vector );
 		this.next_target = target;
 		this.findNextTarget();	

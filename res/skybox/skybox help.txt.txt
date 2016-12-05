@@ -1,0 +1,3 @@
+	Y-pos
+X-pos 	Z-pos 	X-neg 	Z-neg
+	Y-neg

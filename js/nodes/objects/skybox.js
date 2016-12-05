@@ -11,12 +11,13 @@ function weggeSkybox( params ) {
 	this.json.color = "#FF5050";
 	this.json.path = "res/skybox";
 	this.json.imagename = "abovesea";
+	this.json.extension = "png";
 }	
 	
 weggeSkybox.prototype.initialize = function() {
 	var imagePrefix = this.json.path + "/" + this.json.imagename + "-";
 	var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
-	var imageSuffix = ".png";
+	var imageSuffix = "." + this.json.extension;
 	this.size = _coalesce( this.json.size, 10000 );
 	var skyGeometry = new THREE.CubeGeometry( this.size, this.size, this.size );	
 	var materialArray = [];
