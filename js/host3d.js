@@ -2,6 +2,7 @@ function weggeHost3D() {
 	this.container = $("<div></div>").css({display:"block", position: "absolute", left: 0, top: 0, width:"100%", height:"100%"}).appendTo(document.body);
 	this.renderer = new THREE.WebGLRenderer();
 	this.renderer.setClearColor( 0x101010 );
+	this.renderer.setPixelRatio( window.devicePixelRatio );				
 	this.renderer.shadowMap.enabled = true;
 	this.renderer.shadowMap.type = THREE.BasicShadowMap;
 	this.container.append(this.renderer.domElement);
@@ -27,7 +28,7 @@ function weggeHost3D() {
 	this.initScene = function(json) {
 		this.scene = new THREE.Scene();
 		this.initCamera(json);
-		this.onWindowResize();
+		this.WindowResize();
 		this.initialized = true;
 		this.initState(json);		
 	}
@@ -136,6 +137,10 @@ function weggeHost3D() {
 		}
 	}
 	
+	this.render = function() {
+		this.renderer.render( this.scene, this.camera );	
+	}
+	
 	this.animationFrame = function() {	
 		if (!this.renderingPaused) {
 			if (this.stats) this.stats.begin();	
@@ -147,14 +152,17 @@ function weggeHost3D() {
 			if (this.onAnimationFrame && !this.animationPaused) {
 				this.onAnimationFrame(this.delta);
 			}
-			this.renderer.render( this.scene, this.camera );	
+			this.render();
+			if (this.onPostRender) {
+				this.onPostRender();
+			}
 			if (this.stats) this.stats.end();
 		}
 	}
 	
 	this.animationFrameClosure = _bind(this, this.animationFrame);
 		
-	this.onWindowResize = function () {
+	this.WindowResize = function () {
 		this.width = window.innerWidth;
 		this.height = window.innerHeight - 5;
 		this.renderer.setSize( this.width, this.height );
@@ -162,9 +170,12 @@ function weggeHost3D() {
 			this.camera.aspect = this.width / this.height;
 			this.camera.updateProjectionMatrix();	
 		}
+		if (this.onWindowResize) {
+			this.onWindowResize(this.width, this.height);
+		}
 	}
 
-	this.resizeClosure = _bind( this, this.onWindowResize);
+	this.resizeClosure = _bind( this, this.WindowResize);
 	
 	this.destroy = function () {
 		this.stopRendering();

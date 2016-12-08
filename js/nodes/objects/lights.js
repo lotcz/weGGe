@@ -121,12 +121,22 @@ weggeSpotLight.prototype.applyJSON = function() {
 	this.light.distance = this.json.distance;
 	this.light.angle = this.json.angle;
 	this.light.exponent = this.json.exponent;
-	this.light.castShadow = this.json.castShadow;
-	this.light.shadowMapWidth = this.json.shadowMapWidth;
-	this.light.shadowMapHeight = this.json.shadowMapHeight;
-	this.light.shadowCameraNear = this.json.shadowCameraNear;
-	this.light.shadowCameraFar = this.json.shadowCameraFar;
-	this.light.shadowCameraFov = this.json.shadowCameraFov;
+	
+	this.light.castShadow = _b(this.json.castShadow);
+	this.light.shadow.mapSize.width = 1024;
+	this.light.shadow.mapSize.height = 1024;
+	this.light.shadow.camera.near = 1;
+	this.light.shadow.camera.far = 1000;
+	this.light.shadow.camera.fov = 30;
+	
+	/*
+	this.light.castShadow = _b(this.json.castShadow);
+	this.light.shadow.mapSize.width = parseInt(this.json.shadowMapWidth);
+	this.light.shadow.mapSize.height = parseInt(this.json.shadowMapHeight);
+	this.light.shadow.camera.near = parseInt(this.json.shadowCameraNear);
+	this.light.shadow.camera.far = parseInt(this.json.shadowCameraFar);
+	this.light.shadow.camera.fov = parseInt(this.json.shadowCameraFov);
+	*/
 	if (this.helper) {
 		this.helper.update();
 	}
