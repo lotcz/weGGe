@@ -29,10 +29,8 @@ weggePoint.prototype.applyJSON = function() {
 }
 
 weggePoint.prototype.initialize = function ( resources ) {
-	if (WEGGE_CREATOR_MODE) {
-		this.wrapper = new THREE.Object3D();
-		this.applyBasic();
-	}	
+	this.wrapper = new THREE.Object3D();
+	this.applyBasic();
 	return this.wrapper;	
 }
 

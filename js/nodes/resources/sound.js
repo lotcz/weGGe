@@ -7,7 +7,6 @@ function weggeSound() {
 	this.initialized = false;
 	this.json.type = "Sound";
 	this.json.name = "sound";
-	this.json.color = "#FFFFFF";
 	this.json.path = "";
 }
 

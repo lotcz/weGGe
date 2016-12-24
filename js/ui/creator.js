@@ -20,7 +20,6 @@ function weggeCreator() {
 				this.host3D = new weggeHost3D();
 				WEGGE_CREATOR_HELPERS = [];
 				this.level.initialize(this.host3D, this.resources);
-				//this.host3D.scene.fog	= new THREE.FogExp2( 0x000000, 0.001 );
 
 				if (WEGGE_CREATOR_HELPERS.length > 0) {
 					for (var i = WEGGE_CREATOR_HELPERS.length-1; i >= 0; i--) {
@@ -65,6 +64,13 @@ function weggeCreator() {
 		this.level.animationFrame(delta);
 	}
 	
+	this.onKeyPress = function ( event ) {
+			//console.log(event.which);
+			switch ( event.keyCode ) {
+			  
+			}
+		}
+		
 	this.onKeyUp = function ( e ) {
 		var key = e.keyCode ? e.keyCode : e.charCode;
 
@@ -73,7 +79,28 @@ function weggeCreator() {
 				if (this.controls) {
 					this.controls.toggleLook();
 				}
-			break;
+				break;
+			case 73: // I
+				this.transformControls.setSpace( this.space == "local" ? "world" : "local" );
+				break;
+			  case 84: // T
+				this.transformControls.setMode( "translate" );
+				break;
+			  case 89: // Y
+			  case 90: // Z
+				this.transformControls.setMode( "rotate" );
+				break;
+			  case 85: // U
+				this.transformControls.setMode( "scale" );
+				break;
+			case 187:
+			case 107: // +,=,num+
+				this.transformControls.setSize( this.size + 0.1 );
+				break;
+			case 189:
+			case 10: // -,_,num-
+				this.transformControls.setSize( Math.max(this.size - 0.1, 0.1 ) );
+				break;
 		}
 	};
 	

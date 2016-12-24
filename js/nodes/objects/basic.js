@@ -314,6 +314,10 @@ weggeText3D.prototype.initialize = function(resources) {
 	}
 }
 
+weggeText3D.prototype.getRequiredResources = function() {
+	return [this.json.font];
+}
+
 weggeNode.prototype.availableTypes.push("Text3D");
 
 weggeTube.prototype = new weggeObject();

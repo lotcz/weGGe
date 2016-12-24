@@ -31,6 +31,7 @@ weggeObject.prototype.basicPropsEdited = function() {
 
 weggeObject.prototype.applyBasic = function() {
 	if (this.wrapper) {
+		this.wrapper.name = this.json.name + '_wrapper';
 		if (this.wrapper.position) {		
 			_applyArrayToVector(this.wrapper.position, this.json.position);
 		}
@@ -57,10 +58,12 @@ weggeObject.prototype.initializeChildren = function ( resources ) {
 }
 
 weggeObject.prototype.addChildWrapper = function ( wrapper ) {
-	if (!this.wrapper) {
-		this.wrapper = new THREE.Object3D();
+	if (wrapper) {
+		if (!this.wrapper) {
+			this.wrapper = new THREE.Object3D();
+		}
+		this.wrapper.add(wrapper);
 	}
-	this.wrapper.add(wrapper);
 }
 
 weggeObject.prototype.initialize = function ( resources ) {

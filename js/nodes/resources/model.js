@@ -32,6 +32,7 @@ weggeModel.prototype.initialize = function ( onInitialized ) {
 					_this.initialized = true;
 					onInitialized();
 				},
+				undefined,
 				 function ( data ) {
 					console.log("Cannot load model " + _this.json.path);
 					console.log(data);

@@ -34,8 +34,10 @@ function weggeLevel() {
 	this.host3D = false;
 }
 
-weggeLevel.prototype.addChildWrapper = function ( wrapper ) {	
-	this.host3D.scene.add(wrapper);
+weggeLevel.prototype.addChildWrapper = function(wrapper) {
+	if (wrapper) {
+		this.host3D.scene.add(wrapper);
+	}
 }
 
 weggeLevel.prototype.applyJSON = function() {

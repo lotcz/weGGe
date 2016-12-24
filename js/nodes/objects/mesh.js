@@ -49,7 +49,7 @@ function weggeAnimatedMesh() {
 	this.base = weggeMesh;
 	this.base();
 	
-	this.json.name = "--animated-mesh--";
+	this.json.name = "animated_mesh_";
 	this.json.type = "AnimatedMesh";
 	this.json.model_resource_id = 0;
 	this.json.duration = 2;
@@ -65,21 +65,26 @@ weggeAnimatedMesh.prototype.applyJSON = function(resources) {
 	if (resources) {
 		var res = resources.getById( this.json.model_resource_id );
 		if (res && res.geometry && res.material) {
-			this.wrapper = new THREE.MorphAnimMesh( res.geometry, res.material );
+			var material = new THREE.MeshPhongMaterial( {
+				color: 0xffffff,
+				morphTargets: true,
+				vertexColors: THREE.FaceColors,
+				shading: THREE.FlatShading
+			} );
+			this.wrapper = new THREE.Mesh( res.geometry, material );
+			this.mixer = new THREE.AnimationMixer( this.wrapper );
+			this.mixer.clipAction( res.geometry.animations[ 0 ] ).setDuration( this.json.duration ).play();					
 		} else {
 			console.log("Model not initialized:" + this.json.model_resource_id);
 		}
 	}
-	if (this.wrapper) {
-		this.wrapper.duration = _coalesce(this.json.duration, 2);
-		this.wrapper.time = _coalesce(this.json.time, 0);
-	}
+
 	this.applyBasic();
 }
 
 weggeAnimatedMesh.prototype.animationFrame = function (delta) {
-	if (this.wrapper && this.wrapper.updateAnimation) {
-		this.wrapper.updateAnimation(delta);
+	if (this.mixer) {
+		this.mixer.update(delta);
 	}
 }
 
