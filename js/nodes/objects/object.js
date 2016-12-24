@@ -13,6 +13,8 @@ function weggeObject() {
 	this.json.rotation = [0,0,0];
 	this.json.scale = [1,1,1];
 	this.json.physics = 0;
+	this.json.receiveShadow = false;
+	this.json.castShadow = false;
 	this.json.mass = 1;
 	this.json.selectable = 0;
 }
@@ -28,14 +30,18 @@ weggeObject.prototype.basicPropsEdited = function() {
 }
 
 weggeObject.prototype.applyBasic = function() {
-	if (this.wrapper && this.wrapper.position) {		
-		_applyArrayToVector(this.wrapper.position, this.json.position);
-	}
-	if (this.wrapper && this.wrapper.rotation) {		
-		_applyArrayToVector(this.wrapper.rotation, this.json.rotation);
-	}
-	if (this.wrapper && this.wrapper.scale) {		
-		_applyArrayToVector(this.wrapper.scale, this.json.scale);			
+	if (this.wrapper) {
+		if (this.wrapper.position) {		
+			_applyArrayToVector(this.wrapper.position, this.json.position);
+		}
+		if (this.wrapper.rotation) {		
+			_applyArrayToVector(this.wrapper.rotation, this.json.rotation);
+		}
+		if (this.wrapper.scale) {		
+			_applyArrayToVector(this.wrapper.scale, this.json.scale);			
+		}		
+		this.wrapper.castShadow = this.json.castShadow;
+		this.wrapper.receiveShadow = this.json.receiveShadow;
 	}	
 }
 

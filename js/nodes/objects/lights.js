@@ -101,14 +101,15 @@ function weggeSpotLight() {
 	this.json.intensity = 0.5;
 	this.json.distance = 500;
 	this.json.angle = Math.PI/3;
+	this.json.penumbra = 0.3;
 	this.json.exponent = 10;
 	this.json.color = "#FF5050";
 		
-	this.json.castShadow = false;
+	this.json.castShadow = true;
 	this.json.shadowMapWidth = 1024;
 	this.json.shadowMapHeight = 1024;
-	this.json.shadowCameraNear = 500;
-	this.json.shadowCameraFar = 4000;
+	this.json.shadowCameraNear = 10;
+	this.json.shadowCameraFar = this.json.distance;
 	this.json.shadowCameraFov = 30;
 	
 	this.light = false;
@@ -121,37 +122,27 @@ weggeSpotLight.prototype.applyJSON = function() {
 	this.light.distance = this.json.distance;
 	this.light.angle = this.json.angle;
 	this.light.exponent = this.json.exponent;
-	
-	this.light.castShadow = _b(this.json.castShadow);
-	this.light.shadow.mapSize.width = 1024;
-	this.light.shadow.mapSize.height = 1024;
-	this.light.shadow.camera.near = 1;
-	this.light.shadow.camera.far = 1000;
-	this.light.shadow.camera.fov = 30;
-	
-	/*
+
 	this.light.castShadow = _b(this.json.castShadow);
 	this.light.shadow.mapSize.width = parseInt(this.json.shadowMapWidth);
 	this.light.shadow.mapSize.height = parseInt(this.json.shadowMapHeight);
 	this.light.shadow.camera.near = parseInt(this.json.shadowCameraNear);
 	this.light.shadow.camera.far = parseInt(this.json.shadowCameraFar);
 	this.light.shadow.camera.fov = parseInt(this.json.shadowCameraFov);
-	*/
+
 	if (this.helper) {
 		this.helper.update();
 	}
 }
 
 weggeSpotLight.prototype.initialize = function() {
-	this.light = new THREE.SpotLight(_getColorHex(this.json.color));
-	this.target = new THREE.Object3D();
-	this.light.target = this.target;
+	this.light = new THREE.SpotLight(_getColorHex(this.json.color));	
 	this.wrapper.add(this.light);
-	this.wrapper.add(this.target);	
+
 	if (WEGGE_CREATOR_MODE) {		
 		this.helper = new THREE.SpotLightHelper(this.light);
 		WEGGE_CREATOR_HELPERS.push(this.helper);
-	}
+	}	
 	this.applyJSON();
 	return this.wrapper;
 }

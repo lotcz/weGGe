@@ -34,7 +34,7 @@ function weggeHost3D() {
 	}
 	
 	this.updatePhysics = function(delta) {
-		this.scene.simulate( delta, 2 );
+		this.scene.simulate(delta, 2);
 	}
 	
 	this.lookAt = function(v) {
@@ -45,19 +45,15 @@ function weggeHost3D() {
 	
 	this.initCamera = function(json) {		
 		json = _coalesce(json,{});
-		this.camera = new THREE.PerspectiveCamera( parseFloat(_coalesce(json.cameraFov,45)), parseFloat(_coalesce(json.cameraAspect,1)), parseFloat(_coalesce(json.cameraNear,1)), parseFloat(_coalesce(json.cameraFar,10000)) );
+		this.camera = new THREE.PerspectiveCamera(parseFloat(_coalesce(json.cameraFov,45)), parseFloat(_coalesce(json.cameraAspect,1)), parseFloat(_coalesce(json.cameraNear,1)), parseFloat(_coalesce(json.cameraFar,10000)) );
 		this.scene.add(this.camera);
 	}
 	
 	this.initScenePhysics = function(json) {
 		this.scene = new Physijs.Scene;
 		this.scene.setGravity(_arrayToVector(json.gravity));
-		/*this.scene.addEventListener(
-			'update',
-			_bind(this, this.updatePhysics)
-		);*/
 		this.initCamera(json)
-		this.onWindowResize();
+		this.WindowResize();
 		this.initialized = true;
 		this.physicsEnabled = true;
 		this.initState(json);

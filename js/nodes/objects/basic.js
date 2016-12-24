@@ -48,9 +48,7 @@ weggeSphere.prototype.initialize = function(resources) {
 		
 	} else {
 		this.wrapper = new THREE.Mesh( geometry, material );
-	}
-	this.wrapper.castShadow = true;
-	this.wrapper.receiveShadow = true;
+	}	
 	
 	this.applyBasic();
 	return this.wrapper;
@@ -119,9 +117,6 @@ weggeBox.prototype.initialize = function(resources) {
 	} else {
 		console.log("Material couldn't be initialized.");
 	}
-	
-	this.wrapper.castShadow = true;
-	this.wrapper.receiveShadow = true;
 			
 	this.applyBasic();
 	return this.wrapper;
@@ -310,9 +305,6 @@ weggeText3D.prototype.initialize = function(resources) {
 			} else {
 				this.wrapper = new THREE.Mesh( geometry, material);
 			}
-			
-			this.wrapper.castShadow = true;
-			this.wrapper.receiveShadow = true;
 					
 			this.applyBasic();
 			return this.wrapper;
