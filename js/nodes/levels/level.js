@@ -153,7 +153,9 @@ weggeLevel.prototype.initialize = function ( host3D, resources ) {
 	var wrappers = this.initializeChildren(resources);
 	
 	for (var i = 0, max = wrappers.length; i < max; i++ ) {
-		this.host3D.scene.add(wrappers[i]);
+		if (wrappers[i]) {
+			this.host3D.scene.add(wrappers[i]);
+		}
 	}
 	
 	this.applyJSON();

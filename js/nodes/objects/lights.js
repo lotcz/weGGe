@@ -32,16 +32,36 @@ function weggeDirectionalLight() {
 	this.base = weggeObject;
 	this.base();
 	
-	this.json.name = "--directional light--";
+	this.json.name = "directional_light";
 	this.json.type = "DirectionalLight";
 	this.json.intensity = 0.5;
 	this.json.color = "#A0A0A0";
+	
+	this.json.castShadow = true;
+	this.json.shadowMapWidth = 1024;
+	this.json.shadowMapHeight = 1024;
+	this.json.shadowCameraNear = 10;
+	this.json.shadowCameraFar = 1000;
+	this.json.shadowCameraRight = 1000;
+	this.json.shadowCameraLeft = -1000;
+	this.json.shadowCameraTop = 1000;
+	this.json.shadowCameraBottom = -1000;
+	this.json.shadowCameraFov = 30;
 }
 
 weggeDirectionalLight.prototype.applyJSON = function() {
 	this.applyBasic();
 	this.wrapper.color.setStyle(this.json.color);
-	this.wrapper.intensity = this.json.intensity;
+	this.wrapper.intensity = parseFloat(this.json.intensity);
+	this.wrapper.castShadow = _b(this.json.castShadow);
+	this.wrapper.shadow.camera.near = parseFloat(this.json.shadowCameraNear);
+	this.wrapper.shadow.camera.far = parseFloat(this.json.shadowCameraFar);
+	this.wrapper.shadow.camera.right = parseFloat(this.json.shadowCameraRight);
+	this.wrapper.shadow.camera.left = parseFloat(this.json.shadowCameraLeft);
+	this.wrapper.shadow.camera.top	= parseFloat(this.json.shadowCameraTop);
+	this.wrapper.shadow.camera.bottom = parseFloat(this.json.shadowCameraBottom);
+	this.wrapper.shadow.mapSize.width = parseFloat(this.json.shadowMapWidth);
+	this.wrapper.shadow.mapSize.height = parseFloat(this.json.shadowMapHeight);
 }
 
 weggeDirectionalLight.prototype.initialize = function() {
