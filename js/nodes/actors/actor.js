@@ -6,7 +6,7 @@ function weggeActor() {
 	this.base();	
 	
 	this.json.type = "Actor";
-	this.json.name = "--actor--";
+	this.json.name = "actor";
 	this.json.enabled = true;
 	this.json.target_name = "";	
 	

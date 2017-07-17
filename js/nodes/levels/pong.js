@@ -165,6 +165,7 @@ weggePongLevel.prototype.animationFrame = function(delta) {
 		this.tail_speed -= (this.tail_speed*0.2);
 	}
 }
+
 weggePongLevel.prototype.cubeBlast = function() {
 	this.blasts.create(this.cube_actor.target.wrapper.position,2.5);
 }

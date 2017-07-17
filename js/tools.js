@@ -154,7 +154,8 @@ function _getJSON( url, onsuccess, onerror ) {
 
 function _bind( scope, fn ) {
 	return function () {
-		fn.apply( scope, arguments );
+		//Object.assign( fn, scope, arguments );
+		fn.apply(scope, arguments );
 	};
 };
 

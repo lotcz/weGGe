@@ -6,9 +6,9 @@ function weggeMovingActor() {
 	this.base();	
 	
 	this.json.type = "MovingActor";
-	this.json.name = "--Moving actor--";	
+	this.json.name = "moving_actor";	
 	this.json.move_amount = 100;
-	
+	this.json.turn_angle = Math.PI/10;
 }
 
 weggeMovingActor.prototype.moveForward = function(args) {
@@ -27,6 +27,28 @@ weggeMovingActor.prototype.moveBackward = function(args) {
 	}
 }
 
+weggeMovingActor.prototype.turn = function( v ) {
+	if (this.target !== null && this.target.wrapper) {
+		this.target.wrapper.rotateOnAxis( v, this.json.turn_angle );
+	}
+}
+
+weggeMovingActor.prototype.turnLeft = function(args) {
+	this.turn(_v(0,1,0));
+}
+
+weggeMovingActor.prototype.turnRight = function(args) {
+	this.turn(_v(0,-1,0));
+}
+
+weggeMovingActor.prototype.turnUp = function(args) {
+	this.turn(_v(1,0,0));
+}
+
+weggeMovingActor.prototype.turnDown = function(args) {
+	this.turn(_v(-1,0,0));
+}
+
 weggeNode.prototype.availableTypes.push("MovingActor");
 
 weggeFollowActor.prototype = new weggeActor();
@@ -37,7 +59,7 @@ function weggeFollowActor() {
 	this.base();	
 	
 	this.json.type = "FollowActor";
-	this.json.name = "--Follow actor--";	
+	this.json.name = "follow_actor";	
 	this.json.follower_name = "follower_id";	
 }
 

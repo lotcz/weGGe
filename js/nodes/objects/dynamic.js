@@ -5,7 +5,7 @@ function weggeDynamicObjects() {
 	this.base = weggeObject;
 	this.base();
 	
-	this.json.name = "--dynamic-objects--";
+	this.json.name = "dynamic_objects";
 	this.json.type = "DynamicObjects";
 
 }	

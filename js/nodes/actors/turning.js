@@ -6,7 +6,7 @@ function weggeTurningActor() {
 	this.base();	
 	
 	this.json.type = "TurningActor";
-	this.json.name = "--turning actor--";	
+	this.json.name = "turning_actor";	
 	this.json.turn_angle = Math.PI/10;
 	
 }

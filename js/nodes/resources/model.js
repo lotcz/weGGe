@@ -19,16 +19,20 @@ weggeModel.prototype.initialize = function ( onInitialized ) {
 				function ( geometry, materials ) {	
 					//console.log(geometry);
 					//console.log(materials);
+					if (materials) {
+						for (var m = 0, maxm = materials.length; m < maxm; m++) {
+							materials[m].side = THREE.DoubleSide;
+							materials[m].morphTargets = _this.json.morphTargets;
+							//materials[m].morphNormals = true;
+						}
+						_this.material = new THREE.MeshFaceMaterial( materials );
+						//material.vertexColors = THREE.FaceColors;
+						_this.geometry = geometry;
 					
-					for (var m = 0, maxm = materials.length; m < maxm; m++) {
-						materials[m].side = THREE.DoubleSide;
-						materials[m].morphTargets = _this.json.morphTargets;
-						//materials[m].morphNormals = true;
+						
+					} else {
+						console.log("Cannot load model " + _this.json.path + ". No material in JSON.");
 					}
-					_this.material = new THREE.MeshFaceMaterial( materials );
-					//material.vertexColors = THREE.FaceColors;
-					_this.geometry = geometry;
-				
 					_this.initialized = true;
 					onInitialized();
 				},

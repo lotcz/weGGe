@@ -6,7 +6,7 @@ function weggePhysicsActor() {
 	this.base();	
 	
 	this.json.type = "PhysicsActor";
-	this.json.name = "--Physics actor--";	
+	this.json.name = "physics_actor";	
 	this.json.push_amount = 5;
 }
 

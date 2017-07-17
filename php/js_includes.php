@@ -7,8 +7,8 @@
 	<script src='lib/threex.volumetricspotlightmesh.js'></script>
 	<script src='lib/threex.spaceships.js'></script>
 	<script src='lib/threex.grass.js'></script>
-	<script src='lib/MTLLoader.js'></script>
-	<script src='lib/OBJMTLLoader.js'></script>
+	<!--script src='lib/MTLLoader.js'></script>
+	<script src='lib/OBJMTLLoader.js'></script-->
 
 	<script src="lib/physi.js" language="javascript"></script>	
 	<script>
@@ -60,7 +60,7 @@
 	<script src="js/nodes/actors/cruising.js" language="javascript"></script>
 	
 	<script src="js/nodes/levels/level.js" language="javascript"></script>
-	<script src="js/nodes/levels/pong.js" language="javascript"></script>
+	<script src="js/nodes/levels/astronaut.js" language="javascript"></script>
 	
 	<script src="js/ui/ui.js" language="javascript"></script>
 	<script src="js/ui/viewer.js" language="javascript"></script>
